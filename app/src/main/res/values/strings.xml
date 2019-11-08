@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">56-Credit</string>
+    <string name="send">Gửi</string>
+    <string name="info">Thông tin</string>
+    <string name="infoPerson">Thông tin cá nhân</string>
+    <string name="cmnd">Chứng minh nhân dân</string>
+    <string name="selfie">Ảnh tự chụp</string>
+    <string name="reTakePicture">Chụp lại</string>
+    <string name="fullName">Họ tên</string>
+    <string name="idNumber">Số CMND</string>
+    <string name="birthday">Ngày sinh</string>
+    <string name="gender">Giới tính</string>
+    <string name="homeTown">Nguyên quán</string>
+    <string name="buildingNumber">Số nhà &amp; tên đường</string>
+    <string name="wards">Phường/Xã</string>
+    <string name="province">Tỉnh/Thành phố</string>
+    <string name="district">Quận/Huyện</string>
+    <string name="edit">Chỉnh sửa</string>
+
+</resources>
