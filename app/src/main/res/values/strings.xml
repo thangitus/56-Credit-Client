@@ -16,5 +16,12 @@
     <string name="province">Tỉnh/Thành phố</string>
     <string name="district">Quận/Huyện</string>
     <string name="edit">Chỉnh sửa</string>
+    <string name="fillInfo">Điền thông tin cá nhân</string>
+    <string name="male">Nam</string>
+    <string name="female">Nữ</string>
+    <string name="choose">Chọn</string>
+    <string name="address">Địa chỉ hiện tại</string>
+    <string name="notSelected">Chưa chọn</string>
+    <string name="done">Xong</string>
 
 </resources>
