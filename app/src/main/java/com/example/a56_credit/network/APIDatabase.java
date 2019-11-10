@@ -1,7 +1,10 @@
 package com.example.a56_credit.network;
 
+import com.example.a56_credit.model.City;
 import com.example.a56_credit.model.ListCity;
 
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -12,5 +15,5 @@ public interface APIDatabase {
    Call<ListCity> getListCity();
 
    @GET
-   Call<ListCity> getListDistrict(@Url String url);
+   Call<List<City>> getListDistrict(@Url String url);
 }

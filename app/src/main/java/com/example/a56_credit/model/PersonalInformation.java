@@ -14,16 +14,27 @@ public class PersonalInformation implements Parcelable {
    String province;
    String district;
 
-   public PersonalInformation(String fullName, String idNumber, String birthday, String gender, String homeTown, String buildingNumber, String wards, String province, String district) {
+   public PersonalInformation(String fullName, String idNumber, String birthday, String homeTown, String buildingNumber, String wards, String province, String district) {
       this.fullName = fullName;
       this.idNumber = idNumber;
       this.birthday = birthday;
-      this.gender = gender;
       this.homeTown = homeTown;
       this.buildingNumber = buildingNumber;
       this.wards = wards;
       this.province = province;
       this.district = district;
+   }
+
+   public PersonalInformation() {
+      this.fullName = null;
+      this.idNumber = null;
+      this.birthday = null;
+      this.gender = null;
+      this.homeTown = null;
+      this.buildingNumber = null;
+      this.wards = null;
+      this.province = null;
+      this.district = null;
    }
 
    protected PersonalInformation(Parcel in) {

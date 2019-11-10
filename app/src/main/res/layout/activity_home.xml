@@ -243,7 +243,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:paddingEnd="10dp"
-                            android:text="NGUYEN VAN THANG"
                             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                             android:textColor="@color/colorBlueDark" />
                     </LinearLayout>
@@ -275,7 +274,6 @@
                                 android:id="@+id/textViewIdNumber"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="245401302"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                                 android:textColor="@color/colorBlueDark" />
                         </LinearLayout>
@@ -296,7 +294,6 @@
                                 android:id="@+id/textViewBirthday"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="20-05-1999"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                                 android:textColor="@color/colorBlueDark" />
                         </LinearLayout>
@@ -322,7 +319,6 @@
                             android:id="@+id/textViewBuildingNumber"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="3A Nguyen Thi Minh Khai"
                             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                             android:textColor="@color/colorBlueDark" />
                     </LinearLayout>
@@ -347,7 +343,6 @@
                             android:id="@+id/textViewWards"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Linh Trung"
                             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                             android:textColor="@color/colorBlueDark" />
                     </LinearLayout>
@@ -379,7 +374,6 @@
                                 android:id="@+id/textViewProvince"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Nam Dinh"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                                 android:textColor="@color/colorBlueDark" />
                         </LinearLayout>
@@ -400,12 +394,22 @@
                                 android:id="@+id/textViewDistrict"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="20-05-1999"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                                 android:textColor="@color/colorBlueDark" />
                         </LinearLayout>
                     </LinearLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:id="@+id/tvButtonEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:text="@string/edit"
+                    android:textColor="@color/colorGreenLight"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/layoutAddInfo" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <Button
@@ -414,10 +418,10 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="20dp"
+                android:layout_marginBottom="15dp"
                 android:background="@drawable/border_gradient"
                 android:gravity="center"
                 android:paddingTop="12dp"
-                android:layout_marginBottom="15dp"
                 android:text="@string/send"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@color/colorPrimary"
