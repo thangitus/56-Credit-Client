@@ -183,6 +183,7 @@
                     android:weightSum="2">
 
                     <RadioButton
+                        android:id="@+id/radioButtonMale"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -191,6 +192,7 @@
                         android:textColor="@color/colorGrayDark" />
 
                     <RadioButton
+                        android:id="@+id/radioButtonFemale"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"

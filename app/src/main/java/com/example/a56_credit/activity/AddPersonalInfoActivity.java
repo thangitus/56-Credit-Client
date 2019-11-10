@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +48,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    TextView tvHomeTown, tvProvince, tvDistrict;
    ConstraintLayout layoutFillBirthdayInput;
    RadioGroup radioGroupGender;
+   RadioButton radioButtonMale, radioButtonFemale;
    ImageButton imgCalendar;
    Button buttonDone;
    Intent intent;
@@ -65,6 +67,11 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       changeBackground();
       sendDatabaseRequestCity();
       intent = getIntent();
+      Boolean isEdit = intent.getExtras().getBoolean("isEdit");
+      if (isEdit) {
+         personalInformation = intent.getParcelableExtra("info");
+         setData(personalInformation);
+      }
       personalInformation = new PersonalInformation();
       imgCalendar.setOnClickListener(new View.OnClickListener() {
          @Override
@@ -93,10 +100,15 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       radioGroupGender.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
          @Override
          public void onCheckedChanged(RadioGroup radioGroup, int i) {
-            if (i == 1)
-               personalInformation.setGender("Nam");
-            else
-               personalInformation.setGender("Nữ");
+            switch (i) {
+               case R.id.radioButtonMale: {
+                  personalInformation.setGender("Nam");
+                  break;
+               }
+               case R.id.radioButtonFemale: {
+                  personalInformation.setGender("Nữ");
+               }
+            }
          }
       });
       buttonDone.setOnClickListener(new View.OnClickListener() {
@@ -129,6 +141,22 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       tvDistrict = findViewById(R.id.textViewDistrict);
       radioGroupGender = findViewById(R.id.radioGroupGender);
       buttonDone = findViewById(R.id.buttonDone);
+      radioButtonMale = findViewById(R.id.radioButtonMale);
+      radioButtonFemale = findViewById(R.id.radioButtonFemale);
+   }
+
+   private void setData(PersonalInformation personalInformation) {
+      edtFullName.setText(personalInformation.getFullName());
+      edtIdNumber.setText(personalInformation.getIdNumber());
+      edtWards.setText(personalInformation.getWards());
+      edtBuildingNumber.setText(personalInformation.getBuildingNumber());
+      edtBirthday.setText(personalInformation.getBirthday());
+      tvHomeTown.setText(personalInformation.getHomeTown());
+      tvDistrict.setText(personalInformation.getDistrict());
+      tvProvince.setText(personalInformation.getProvince());
+      if (personalInformation.getGender().equals("Nam"))
+         radioButtonMale.setChecked(true);
+      else radioButtonFemale.setChecked(true);
    }
 
    private void changeBackground() {
@@ -278,7 +306,6 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       personalInformation.setWards(wards);
       personalInformation.setProvince(province);
       personalInformation.setDistrict(district);
-
    }
 
    private Boolean checkData(PersonalInformation personalInformation) {

@@ -32,12 +32,22 @@ public class HomeActivity extends AppCompatActivity {
          constraintLayoutAddInfo.setVisibility(View.GONE);
          tvButtonEdit.setVisibility(View.GONE);
       }
-
       intentToAddInfo = new Intent(this, AddPersonalInfoActivity.class);
       constraintLayoutInfo.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-            startActivityForResult(intentToAddInfo, REQUEST_CODE);
+            if (personalInformation == null){
+               intentToAddInfo.putExtra("isEdit",false);
+               startActivityForResult(intentToAddInfo, REQUEST_CODE);
+            }
+         }
+      });
+      tvButtonEdit.setOnClickListener(new View.OnClickListener() {
+         @Override
+         public void onClick(View view) {
+            intentToAddInfo.putExtra("isEdit",true);
+            intentToAddInfo.putExtra("info",personalInformation);
+            startActivityForResult(intentToAddInfo,REQUEST_CODE);
          }
       });
    }
