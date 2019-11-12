@@ -4,6 +4,18 @@
     package="com.example.a56_credit">
 
     <uses-permission android:name="android.permission.INTERNET" />
+<<<<<<< Updated upstream
+=======
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
+>>>>>>> Stashed changes
 
     <application
         android:allowBackup="true"
@@ -12,14 +24,19 @@
         android:roundIcon="@drawable/ic_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+<<<<<<< Updated upstream
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".activity.AddPersonalInfoActivity">
+=======
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:replace="android:allowBackup">
+        <activity android:name=".activity.CameraBackActivity">
+>>>>>>> Stashed changes
 
         </activity>
         <activity android:name=".activity.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
