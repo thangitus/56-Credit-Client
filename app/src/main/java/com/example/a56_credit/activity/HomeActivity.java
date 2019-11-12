@@ -4,124 +4,124 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Intent;
-<<<<<<< Updated upstream
+import android.graphics.Matrix;
 import android.os.Bundle;
-=======
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
->>>>>>> Stashed changes
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.a56_credit.R;
 import com.example.a56_credit.model.PersonalInformation;
 
-<<<<<<< Updated upstream
-=======
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
->>>>>>> Stashed changes
 public class HomeActivity extends AppCompatActivity {
-   private static final int REQUEST_CODE = 1;
-   ConstraintLayout constraintLayoutCMND, constraintLayoutAddInfo, constraintLayoutInfo;
+   private static final int REQUEST_CODE_INFO = 1, REQUEST_CODE_CAMERA_BACK = 2, REQUEST_CODE_CAMERA_FRONT = 3;
+   ConstraintLayout constraintLayoutCMND, constraintLayoutAddInfo, constraintLayoutInfo, constraintLayoutSelfie;
    TextView tvFullName, tvIdNumber, tvBirthday, tvBuildingNumber, tvWards, tvProvince, tvDistrict;
-   TextView tvButtonEdit;
+   TextView tvButtonEdit, tvReIdenty, tvReSelfie;
    PersonalInformation personalInformation;
-<<<<<<< Updated upstream
-   Intent intentToAddInfo;
-=======
-   Intent intentToAddInfo, intentToCameraBack, intentCameraBack, intentCameraFront;
+   Intent intentToAddInfo, intentCameraBack, intentCameraFront;
    ImageView imgCMND, imgSelfie;
    Bitmap bitmapCMND, bitmapSelfie;
    SharedPreferences mPrefs;
-   private Uri mImageUri;
-   String currentPhotoPath;
->>>>>>> Stashed changes
 
-   @SuppressLint("ClickableViewAccessibility")
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_home);
       mapping();
+      mPrefs = getSharedPreferences("data", MODE_PRIVATE);
+      setupIMG();
       if (personalInformation == null) {
          constraintLayoutAddInfo.setVisibility(View.GONE);
          tvButtonEdit.setVisibility(View.GONE);
       }
+      personalInformation = new PersonalInformation();
       intentToAddInfo = new Intent(this, AddPersonalInfoActivity.class);
       constraintLayoutInfo.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-            if (personalInformation == null){
-               intentToAddInfo.putExtra("isEdit",false);
-               startActivityForResult(intentToAddInfo, REQUEST_CODE);
+            if (personalInformation == null) {
+               intentToAddInfo.putExtra("isEdit", false);
+               startActivityForResult(intentToAddInfo, REQUEST_CODE_INFO);
             }
          }
       });
       tvButtonEdit.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-<<<<<<< Updated upstream
-            intentToAddInfo.putExtra("isEdit",true);
-            intentToAddInfo.putExtra("info",personalInformation);
-            startActivityForResult(intentToAddInfo,REQUEST_CODE);
-=======
-            intentToAddInfo.putExtra("isEdit", true);
-            intentToAddInfo.putExtra("info", personalInformation);
-            startActivityForResult(intentToAddInfo, REQUEST_CODE_INFO);
+            editInfo();
          }
       });
       constraintLayoutCMND.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
             if (bitmapCMND == null)
-            startActivityForResult(intentToCameraBack, REQUEST_CODE_CAMERA_BACK);
-//               openCameraBack();
+               openCameraBack();
          }
       });
       tvReIdenty.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-//            openCameraBack();
-            startActivityForResult(intentToCameraBack, REQUEST_CODE_CAMERA_BACK);
+            openCameraBack();
          }
       });
       constraintLayoutSelfie.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
             if (bitmapSelfie == null)
-               openCameraFront();
+               Log.d("bbcc", "111");
          }
       });
       tvReSelfie.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-            openCameraFront();
->>>>>>> Stashed changes
+            Log.d("bbcc", "111");
+
          }
       });
+   }
+
+   private void setupIMG() {
+      Bitmap bitmap = loadBitmap("identity");
+      if (bitmap != null) {
+         imgCMND.setImageBitmap(bitmap);
+         imgCMND.setVisibility(View.VISIBLE);
+         tvReIdenty.setVisibility(View.VISIBLE);
+      } else {
+         imgCMND.setVisibility(View.GONE);
+         tvReIdenty.setVisibility(View.GONE);
+      }
+
+      bitmap = loadBitmap("selfie");
+      if (bitmap != null) {
+         imgSelfie.setImageBitmap(bitmap);
+         imgSelfie.setVisibility(View.VISIBLE);
+         tvReSelfie.setVisibility(View.VISIBLE);
+      } else {
+         imgSelfie.setVisibility(View.GONE);
+         tvReSelfie.setVisibility(View.GONE);
+      }
+   }
+
+   private void setIMG(ImageView img, Bitmap bitmap) {
+      img.setImageBitmap(bitmap);
+      img.setVisibility(View.VISIBLE);
    }
 
    private void mapping() {
       constraintLayoutCMND = findViewById(R.id.layoutCMND);
       constraintLayoutInfo = findViewById(R.id.layoutInfo);
       constraintLayoutAddInfo = findViewById(R.id.layoutAddInfo);
+      constraintLayoutSelfie = findViewById(R.id.layoutSelfie);
       tvFullName = findViewById(R.id.textViewFullName);
       tvBirthday = findViewById(R.id.textViewBirthday);
       tvWards = findViewById(R.id.textViewWards);
@@ -130,36 +130,40 @@ public class HomeActivity extends AppCompatActivity {
       tvBuildingNumber = findViewById(R.id.textViewBuildingNumber);
       tvProvince = findViewById(R.id.textViewProvince);
       tvButtonEdit = findViewById(R.id.tvButtonEdit);
+      tvReSelfie = findViewById(R.id.reTakePictureSelfie);
+      tvReIdenty = findViewById(R.id.reTakePicture);
+      imgCMND = findViewById(R.id.imgCMND);
+      imgSelfie = findViewById(R.id.imgSelfie);
+   }
+
+   private void editInfo() {
+      intentToAddInfo.putExtra("isEdit", true);
+      intentToAddInfo.putExtra("info", personalInformation);
+      startActivityForResult(intentToAddInfo, REQUEST_CODE_INFO);
    }
 
    @Override
    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
       super.onActivityResult(requestCode, resultCode, data);
-      if ((requestCode == REQUEST_CODE) && (resultCode == Activity.RESULT_OK)) {
+      if ((requestCode == REQUEST_CODE_INFO) && (resultCode == Activity.RESULT_OK)) {
          personalInformation = data.getParcelableExtra("info");
-         tvFullName.setText(personalInformation.getFullName());
-         tvIdNumber.setText(personalInformation.getIdNumber());
-         tvProvince.setText(personalInformation.getProvince());
-         tvBuildingNumber.setText(personalInformation.getBuildingNumber());
-         tvBirthday.setText(personalInformation.getBirthday());
-         tvDistrict.setText(personalInformation.getDistrict());
-         tvWards.setText(personalInformation.getWards());
-         constraintLayoutAddInfo.setVisibility(View.VISIBLE);
-         tvButtonEdit.setVisibility(View.VISIBLE);
+         setInfo();
       }
-<<<<<<< Updated upstream
-   }
-=======
+
       if ((requestCode == REQUEST_CODE_CAMERA_BACK) && (resultCode == Activity.RESULT_OK)) {
-//         Boolean hasPic = data.getBooleanExtra("hasPic", false);
-//         if (hasPic) {
-//            byte[] bytes = data.getByteArrayExtra("image");
-//            Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-//            imgCMND.setImageBitmap(bmp);
-//         }
-         grabImage(imgCMND, "identity");
-         tvReIdenty.setVisibility(View.VISIBLE);
+         Boolean hasPic = data.getBooleanExtra("hasPhoto", false);
+         if (hasPic) {
+            byte[] bytes = data.getByteArrayExtra("photo");
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            Matrix matrix=new Matrix();
+            matrix.setRotate(-90);
+            bitmapCMND=Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
+            setIMG(imgCMND, bitmapCMND);
+            tvReIdenty.setVisibility(View.VISIBLE);
+            saveBitmap(bitmapCMND, "identity");
+         }
       }
+
       if ((requestCode == REQUEST_CODE_CAMERA_FRONT) && (resultCode == Activity.RESULT_OK)) {
          bitmapSelfie = (Bitmap) data.getExtras().get("data");
          imgSelfie.setImageBitmap(bitmapSelfie);
@@ -167,32 +171,24 @@ public class HomeActivity extends AppCompatActivity {
          tvReSelfie.setVisibility(View.VISIBLE);
          saveBitmap(bitmapSelfie, "selfie");
       }
+
+   }
+
+   private void setInfo() {
+      tvFullName.setText(personalInformation.getFullName());
+      tvIdNumber.setText(personalInformation.getIdNumber());
+      tvProvince.setText(personalInformation.getProvince());
+      tvBuildingNumber.setText(personalInformation.getBuildingNumber());
+      tvBirthday.setText(personalInformation.getBirthday());
+      tvDistrict.setText(personalInformation.getDistrict());
+      tvWards.setText(personalInformation.getWards());
+      constraintLayoutAddInfo.setVisibility(View.VISIBLE);
+      tvButtonEdit.setVisibility(View.VISIBLE);
    }
 
    private void openCameraBack() {
-      intentCameraBack = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-      File photoFile;
-      try {
-         photoFile = createImageFile();
-      } catch (Exception e) {
-         Log.v("Pic", "Can't create file to take picture!");
-         Toast.makeText(this, "Please check SD card! Image shot is impossible!", Toast.LENGTH_SHORT).show();
-         return;
-      }
-      if (photoFile != null) {
-         Uri photoURI = FileProvider.getUriForFile(this,
-                 "com.example.android.fileprovider",
-                 photoFile);
-         intentCameraBack.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-         startActivityForResult(intentCameraBack, REQUEST_CODE_CAMERA_BACK);
-      }
-   }
-//      startActivityForResult(intentCameraBack, REQUEST_CODE_CAMERA_BACK);
-
-   private void openCameraFront() {
-      intentCameraFront = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-      intentCameraFront.putExtra("android.intent.extras.CAMERA_FACING", 1);
-      startActivityForResult(intentCameraFront, REQUEST_CODE_CAMERA_FRONT);
+      intentCameraBack = new Intent(this, CameraBackActivity.class);
+      startActivityForResult(intentCameraBack, REQUEST_CODE_CAMERA_BACK);
    }
 
    private void saveBitmap(Bitmap bitmap, String key) {
@@ -218,35 +214,4 @@ public class HomeActivity extends AppCompatActivity {
       return bm;
    }
 
-   private File createImageFile() throws IOException {
-      // Create an image file name
-      String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-      String imageFileName = "JPEG_" + timeStamp + "_";
-      File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-      File image = File.createTempFile(
-              imageFileName,  /* prefix */
-              ".JPG",         /* suffix */
-              storageDir      /* directory */
-      );
-
-      // Save a file: path for use with ACTION_VIEW intents
-      currentPhotoPath = image.getAbsolutePath();
-      return image;
-   }
-
-   public void grabImage(ImageView imageView, String key) {
-      this.getContentResolver().notifyChange(mImageUri, null);
-      ContentResolver cr = this.getContentResolver();
-      Bitmap bitmap;
-      try {
-         bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, mImageUri);
-         saveBitmap(bitmap, key);
-         imageView.setImageBitmap(bitmap);
-      } catch (Exception e) {
-         Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show();
-         Log.d("Pic", "Failed to load", e);
-      }
-      imageView.setVisibility(View.VISIBLE);
-   }
->>>>>>> Stashed changes
 }

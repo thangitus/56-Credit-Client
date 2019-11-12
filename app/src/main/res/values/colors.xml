@@ -9,4 +9,5 @@
     <color name="colorGrayLightest">#DBDBDB</color>
     <color name="colorGrayDark">#616A66</color>
     <color name="colorBlueDark">#5C6C7B</color>
+    <color name="colorWhiteTransparency">#74FFFFFF</color>
 </resources>

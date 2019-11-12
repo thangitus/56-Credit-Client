@@ -13,6 +13,8 @@ public class PersonalInformation implements Parcelable {
    String wards;
    String province;
    String district;
+   String identity;
+   String selfie;
 
    public PersonalInformation(String fullName, String idNumber, String birthday, String homeTown, String buildingNumber, String wards, String province, String district) {
       this.fullName = fullName;
@@ -25,6 +27,22 @@ public class PersonalInformation implements Parcelable {
       this.district = district;
    }
 
+   public String getIdentity() {
+      return identity;
+   }
+
+   public void setIdentity(String identity) {
+      this.identity = identity;
+   }
+
+   public String getSelfie() {
+      return selfie;
+   }
+
+   public void setSelfie(String selfie) {
+      this.selfie = selfie;
+   }
+
    public PersonalInformation() {
       this.fullName = null;
       this.idNumber = null;
@@ -35,6 +53,8 @@ public class PersonalInformation implements Parcelable {
       this.wards = null;
       this.province = null;
       this.district = null;
+      this.identity = null;
+      this.selfie = null;
    }
 
    protected PersonalInformation(Parcel in) {

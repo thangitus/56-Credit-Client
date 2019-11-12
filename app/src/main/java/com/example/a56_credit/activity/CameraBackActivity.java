@@ -2,6 +2,8 @@ package com.example.a56_credit.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.DisplayMetrics;
@@ -26,6 +28,7 @@ public class CameraBackActivity extends AppCompatActivity {
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_camera_back);
+      final Intent intent = getIntent();
       mapping();
       setSizeFrame(imgFrame);
       buttonTakePic.setOnClickListener(new View.OnClickListener() {
@@ -34,11 +37,26 @@ public class CameraBackActivity extends AppCompatActivity {
             cameraKitView.captureImage(new CameraKitView.ImageCallback() {
                @Override
                public void onImage(CameraKitView cameraKitView, final byte[] capturedImage) {
-                  String base64 = Base64.encodeToString(capturedImage, Base64.DEFAULT);
+                  sendToHomeActivity(intent, capturedImage);
                }
             });
          }
       });
+      buttonClose.setOnClickListener(new View.OnClickListener() {
+         @Override
+         public void onClick(View view) {
+            intent.putExtra("hasPhoto", false);
+            setResult(Activity.RESULT_OK, intent);
+            finish();
+         }
+      });
+   }
+
+   private void sendToHomeActivity(Intent intent, byte[] bytes) {
+      intent.putExtra("hasPhoto", true);
+      intent.putExtra("photo", bytes);
+      setResult(Activity.RESULT_OK, intent);
+      finish();
    }
 
    @Override
@@ -70,6 +88,7 @@ public class CameraBackActivity extends AppCompatActivity {
       super.onRequestPermissionsResult(requestCode, permissions, grantResults);
       cameraKitView.onRequestPermissionsResult(requestCode, permissions, grantResults);
    }
+
 
    private void mapping() {
       imgFrame = findViewById(R.id.frame);
