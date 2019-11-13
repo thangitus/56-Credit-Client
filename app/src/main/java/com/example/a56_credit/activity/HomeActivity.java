@@ -78,22 +78,22 @@ public class HomeActivity extends AppCompatActivity {
          @Override
          public void onClick(View view) {
             if (bitmapSelfie == null)
-               Log.d("bbcc", "111");
+               openCameraFront();
          }
       });
       tvReSelfie.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-            Log.d("bbcc", "111");
+            openCameraFront();
 
          }
       });
    }
 
    private void setupIMG() {
-      Bitmap bitmap = loadBitmap("identity");
-      if (bitmap != null) {
-         imgCMND.setImageBitmap(bitmap);
+    bitmapCMND = loadBitmap("identity");
+      if (bitmapCMND != null) {
+         imgCMND.setImageBitmap(bitmapCMND);
          imgCMND.setVisibility(View.VISIBLE);
          tvReIdenty.setVisibility(View.VISIBLE);
       } else {
@@ -101,9 +101,9 @@ public class HomeActivity extends AppCompatActivity {
          tvReIdenty.setVisibility(View.GONE);
       }
 
-      bitmap = loadBitmap("selfie");
-      if (bitmap != null) {
-         imgSelfie.setImageBitmap(bitmap);
+     bitmapSelfie = loadBitmap("selfie");
+      if (bitmapSelfie != null) {
+         imgSelfie.setImageBitmap(bitmapSelfie);
          imgSelfie.setVisibility(View.VISIBLE);
          tvReSelfie.setVisibility(View.VISIBLE);
       } else {
@@ -151,13 +151,13 @@ public class HomeActivity extends AppCompatActivity {
       }
 
       if ((requestCode == REQUEST_CODE_CAMERA_BACK) && (resultCode == Activity.RESULT_OK)) {
-         Boolean hasPic = data.getBooleanExtra("hasPhoto", false);
-         if (hasPic) {
+         Boolean hasPhoto = data.getBooleanExtra("hasPhoto", false);
+         if (hasPhoto) {
             byte[] bytes = data.getByteArrayExtra("photo");
             Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            Matrix matrix=new Matrix();
+            Matrix matrix = new Matrix();
             matrix.setRotate(-90);
-            bitmapCMND=Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
+            bitmapCMND = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
             setIMG(imgCMND, bitmapCMND);
             tvReIdenty.setVisibility(View.VISIBLE);
             saveBitmap(bitmapCMND, "identity");
@@ -165,13 +165,15 @@ public class HomeActivity extends AppCompatActivity {
       }
 
       if ((requestCode == REQUEST_CODE_CAMERA_FRONT) && (resultCode == Activity.RESULT_OK)) {
-         bitmapSelfie = (Bitmap) data.getExtras().get("data");
-         imgSelfie.setImageBitmap(bitmapSelfie);
-         imgSelfie.setVisibility(View.VISIBLE);
-         tvReSelfie.setVisibility(View.VISIBLE);
-         saveBitmap(bitmapSelfie, "selfie");
+         Boolean hasPhoto = data.getBooleanExtra("hasPhoto", false);
+         if (hasPhoto) {
+            byte[] bytes = data.getByteArrayExtra("photo");
+            bitmapSelfie = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            setIMG(imgSelfie, bitmapSelfie);
+            tvReSelfie.setVisibility(View.VISIBLE);
+            saveBitmap(bitmapSelfie, "selfie");
+         }
       }
-
    }
 
    private void setInfo() {
@@ -189,6 +191,11 @@ public class HomeActivity extends AppCompatActivity {
    private void openCameraBack() {
       intentCameraBack = new Intent(this, CameraBackActivity.class);
       startActivityForResult(intentCameraBack, REQUEST_CODE_CAMERA_BACK);
+   }
+
+   private void openCameraFront() {
+      intentCameraFront = new Intent(this, CameraFrontActivity.class);
+      startActivityForResult(intentCameraFront, REQUEST_CODE_CAMERA_FRONT);
    }
 
    private void saveBitmap(Bitmap bitmap, String key) {
