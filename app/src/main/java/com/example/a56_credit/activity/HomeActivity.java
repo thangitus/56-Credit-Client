@@ -49,7 +49,7 @@ public class HomeActivity extends AppCompatActivity {
       constraintLayoutInfo.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-            if (personalInformation == null) {
+            if (personalInformation.getIdNumber() == null) {
                intentToAddInfo.putExtra("isEdit", false);
                startActivityForResult(intentToAddInfo, REQUEST_CODE_INFO);
             }
@@ -91,7 +91,7 @@ public class HomeActivity extends AppCompatActivity {
    }
 
    private void setupIMG() {
-    bitmapCMND = loadBitmap("identity");
+      bitmapCMND = loadBitmap("identity");
       if (bitmapCMND != null) {
          imgCMND.setImageBitmap(bitmapCMND);
          imgCMND.setVisibility(View.VISIBLE);
@@ -101,7 +101,7 @@ public class HomeActivity extends AppCompatActivity {
          tvReIdenty.setVisibility(View.GONE);
       }
 
-     bitmapSelfie = loadBitmap("selfie");
+      bitmapSelfie = loadBitmap("selfie");
       if (bitmapSelfie != null) {
          imgSelfie.setImageBitmap(bitmapSelfie);
          imgSelfie.setVisibility(View.VISIBLE);
@@ -116,6 +116,10 @@ public class HomeActivity extends AppCompatActivity {
       img.setImageBitmap(bitmap);
       img.setVisibility(View.VISIBLE);
    }
+
+//   private Bitmap cropBitmap(Bitmap bitmap) {
+//
+//   }
 
    private void mapping() {
       constraintLayoutCMND = findViewById(R.id.layoutCMND);

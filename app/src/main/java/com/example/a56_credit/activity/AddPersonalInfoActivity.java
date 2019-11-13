@@ -244,6 +244,10 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    }
 
    private void pickHomeTown() {
+      if (tittleCityList == null) {
+         Toast.makeText(this, "Vui lòng kiểm tra kết nối internet", Toast.LENGTH_SHORT).show();
+         return;
+      }
       AlertDialog.Builder builder = new AlertDialog.Builder(this);
       builder.setTitle("Chọn nguyên quán");
       CharSequence[] cs = tittleCityList.toArray(new CharSequence[tittleCityList.size()]);
@@ -258,6 +262,10 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    }
 
    private void pickProvince() {
+      if (tittleDistrictList == null) {
+         Toast.makeText(this, "Vui lòng kiểm tra kết nối internet", Toast.LENGTH_SHORT).show();
+         return;
+      }
       AlertDialog.Builder builder = new AlertDialog.Builder(this);
       builder.setTitle("Chọn tỉnh/thành");
       CharSequence[] cs = tittleCityList.toArray(new CharSequence[tittleCityList.size()]);
@@ -273,8 +281,10 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    }
 
    private void pickDistrict() {
-      if (tittleDistrictList == null)
+      if (tittleDistrictList == null) {
+         Toast.makeText(this, "Vui lòng kiểm tra kết nối internet", Toast.LENGTH_SHORT).show();
          return;
+      }
       AlertDialog.Builder builder = new AlertDialog.Builder(this);
       builder.setTitle("Chọn quận/huyện");
       CharSequence[] cs = tittleDistrictList.toArray(new CharSequence[tittleDistrictList.size()]);
