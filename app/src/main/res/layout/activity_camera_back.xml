@@ -7,21 +7,15 @@
     android:background="@color/colorGrayDark"
     tools:context=".activity.CameraBackActivity">
 
-
-    <com.camerakit.CameraKitView
-        android:id="@+id/camera"
+    <TextureView
+        android:id="@+id/view_finder"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:keepScreenOn="true"
-        app:camera_facing="back"
-        app:camera_focus="continuous"
-        app:camera_imageJpegQuality="100"
-        app:camera_permissions="camera"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <View
         android:id="@+id/viewTop"
         android:layout_width="match_parent"
@@ -107,8 +101,8 @@
         android:id="@+id/frame"
         android:layout_width="209dp"
         android:layout_height="332dp"
-        android:layout_marginBottom="35dp"
         android:layout_marginEnd="40dp"
+        android:layout_marginBottom="35dp"
         android:scaleType="fitCenter"
         android:src="@drawable/frame_camera"
         app:layout_constraintBottom_toBottomOf="parent"

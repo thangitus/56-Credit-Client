@@ -4,9 +4,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Matrix;
 import android.os.Bundle;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -33,17 +33,20 @@ public class HomeActivity extends AppCompatActivity {
    Bitmap bitmapCMND, bitmapSelfie;
    SharedPreferences mPrefs;
 
+//   @SuppressLint("WrongThread")
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_home);
       mapping();
+      Log.wtf("abc","onCreate");
       mPrefs = getSharedPreferences("data", MODE_PRIVATE);
-      setupIMG();
+
       if (personalInformation == null) {
          constraintLayoutAddInfo.setVisibility(View.GONE);
          tvButtonEdit.setVisibility(View.GONE);
       }
+      setupIMG();
       personalInformation = new PersonalInformation();
       intentToAddInfo = new Intent(this, AddPersonalInfoActivity.class);
       constraintLayoutInfo.setOnClickListener(new View.OnClickListener() {
@@ -91,7 +94,7 @@ public class HomeActivity extends AppCompatActivity {
    }
 
    private void setupIMG() {
-      bitmapCMND = loadBitmap("identity");
+//      bitmapCMND = loadBitmap("identity");
       if (bitmapCMND != null) {
          imgCMND.setImageBitmap(bitmapCMND);
          imgCMND.setVisibility(View.VISIBLE);
@@ -101,7 +104,7 @@ public class HomeActivity extends AppCompatActivity {
          tvReIdenty.setVisibility(View.GONE);
       }
 
-      bitmapSelfie = loadBitmap("selfie");
+//      bitmapSelfie = loadBitmap("selfie");
       if (bitmapSelfie != null) {
          imgSelfie.setImageBitmap(bitmapSelfie);
          imgSelfie.setVisibility(View.VISIBLE);
@@ -110,6 +113,7 @@ public class HomeActivity extends AppCompatActivity {
          imgSelfie.setVisibility(View.GONE);
          tvReSelfie.setVisibility(View.GONE);
       }
+
    }
 
    private void setIMG(ImageView img, Bitmap bitmap) {
@@ -117,9 +121,6 @@ public class HomeActivity extends AppCompatActivity {
       img.setVisibility(View.VISIBLE);
    }
 
-//   private Bitmap cropBitmap(Bitmap bitmap) {
-//
-//   }
 
    private void mapping() {
       constraintLayoutCMND = findViewById(R.id.layoutCMND);
@@ -157,25 +158,22 @@ public class HomeActivity extends AppCompatActivity {
       if ((requestCode == REQUEST_CODE_CAMERA_BACK) && (resultCode == Activity.RESULT_OK)) {
          Boolean hasPhoto = data.getBooleanExtra("hasPhoto", false);
          if (hasPhoto) {
-            byte[] bytes = data.getByteArrayExtra("photo");
-            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            Matrix matrix = new Matrix();
-            matrix.setRotate(-90);
-            bitmapCMND = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            String path = data.getStringExtra("photo");
+            Bitmap bitmapCMND = BitmapFactory.decodeFile(path);
             setIMG(imgCMND, bitmapCMND);
             tvReIdenty.setVisibility(View.VISIBLE);
-            saveBitmap(bitmapCMND, "identity");
+//            saveBitmap(bitmapCMND, "identity");
          }
       }
 
       if ((requestCode == REQUEST_CODE_CAMERA_FRONT) && (resultCode == Activity.RESULT_OK)) {
          Boolean hasPhoto = data.getBooleanExtra("hasPhoto", false);
          if (hasPhoto) {
-            byte[] bytes = data.getByteArrayExtra("photo");
-            bitmapSelfie = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            String path = data.getStringExtra("photo");
+            Bitmap bitmapSelfie = BitmapFactory.decodeFile(path);
             setIMG(imgSelfie, bitmapSelfie);
             tvReSelfie.setVisibility(View.VISIBLE);
-            saveBitmap(bitmapSelfie, "selfie");
+//            saveBitmap(bitmapSelfie, "selfie");
          }
       }
    }
@@ -225,4 +223,24 @@ public class HomeActivity extends AppCompatActivity {
       return bm;
    }
 
+   @Override
+   protected void onResume() {
+      super.onResume();
+      Log.wtf("abc","onResume");
+
+   }
+
+   @Override
+   protected void onPause() {
+      super.onPause();
+      Log.wtf("abc","onPause");
+
+   }
+
+   @Override
+   protected void onDestroy() {
+      super.onDestroy();
+      Log.wtf("abc","onDestroy");
+
+   }
 }
