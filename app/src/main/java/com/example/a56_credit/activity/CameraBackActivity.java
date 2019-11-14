@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Base64;
 import android.util.DisplayMetrics;
+import android.util.Size;
 import android.view.Display;
 import android.view.TextureView;
 import android.view.View;
@@ -46,17 +47,10 @@ public class CameraBackActivity extends AppCompatActivity {
       setContentView(R.layout.activity_camera_back);
       final Intent intent = getIntent();
       mapping();
-      PreviewConfig config = new PreviewConfig.Builder().setLensFacing(CameraX.LensFacing.BACK).build();
-      Preview preview = new Preview(config);
+      setSizeFrame(imgFrame);
       CameraX.unbindAll();
-      ImageCaptureConfig config1 =
-              new ImageCaptureConfig.Builder()
-                      .setTargetRotation(getWindowManager().getDefaultDisplay().getRotation())
-                      .setLensFacing(CameraX.LensFacing.BACK)
-                      .build();
-
-      ImageCapture imageCapture = new ImageCapture(config1);
-
+      Preview preview = createPreview();
+      ImageCapture imageCapture = createImageCapture();
       preview.setOnPreviewOutputUpdateListener(
               new Preview.OnPreviewOutputUpdateListener() {
                  @Override
@@ -70,7 +64,6 @@ public class CameraBackActivity extends AppCompatActivity {
 // The use case is bound to an Android Lifecycle with the following code.
       CameraX.bindToLifecycle(this, imageCapture, preview);
 
-      setSizeFrame(imgFrame);
       buttonTakePic.setOnClickListener(new View.OnClickListener() {
          @SuppressLint("RestrictedApi")
          @Override
@@ -84,6 +77,7 @@ public class CameraBackActivity extends AppCompatActivity {
                   setResult(Activity.RESULT_OK, intent);
                   finish();
                }
+
                @Override
                public void onError(@NonNull ImageCapture.ImageCaptureError imageCaptureError, @NonNull String message, @Nullable Throwable cause) {
 
@@ -91,6 +85,7 @@ public class CameraBackActivity extends AppCompatActivity {
             });
          }
       });
+
       buttonClose.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
@@ -100,6 +95,26 @@ public class CameraBackActivity extends AppCompatActivity {
          }
       });
    }
+
+   private ImageCapture createImageCapture() {
+      ImageCaptureConfig imageCaptureConfig =
+              new ImageCaptureConfig.Builder()
+                      .setTargetRotation(getWindowManager().getDefaultDisplay().getRotation())
+                      .setLensFacing(CameraX.LensFacing.BACK)
+                      .build();
+
+      ImageCapture imageCapture = new ImageCapture(imageCaptureConfig);
+      return imageCapture;
+   }
+
+   private Preview createPreview() {
+      PreviewConfig previewConfig = new PreviewConfig.Builder()
+              .setLensFacing(CameraX.LensFacing.BACK)
+              .build();
+      Preview preview = new Preview(previewConfig);
+      return preview;
+   }
+
    private byte[] cropIMG(byte[] capturedImage) {
       Bitmap bitmap = BitmapFactory.decodeByteArray(capturedImage, 0, capturedImage.length);
       float widthScreen, heightScreen, heightTop, heightBottom, widthLeft, widthRight;

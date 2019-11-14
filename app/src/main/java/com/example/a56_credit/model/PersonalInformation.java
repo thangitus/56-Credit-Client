@@ -3,17 +3,37 @@ package com.example.a56_credit.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 public class PersonalInformation implements Parcelable {
+
+   @SerializedName("FullName")
    String fullName;
+
+   @SerializedName("IdentityNumber")
    String idNumber;
+
+   @SerializedName("Birthday")
    String birthday;
+
    String gender;
+
+   @SerializedName("Hometown")
    String homeTown;
+
    String buildingNumber;
    String wards;
+
+   @SerializedName("Province")
    String province;
+
+   @SerializedName("District")
    String district;
+
+   @SerializedName("IdentityCardImage")
    String identity;
+
+   @SerializedName("SelfieImage")
    String selfie;
 
    public PersonalInformation(String fullName, String idNumber, String birthday, String homeTown, String buildingNumber, String wards, String province, String district) {

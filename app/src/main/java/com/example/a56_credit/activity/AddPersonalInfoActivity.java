@@ -262,7 +262,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    }
 
    private void pickProvince() {
-      if (tittleDistrictList == null) {
+      if (tittleCityList == null) {
          Toast.makeText(this, "Vui lòng kiểm tra kết nối internet", Toast.LENGTH_SHORT).show();
          return;
       }

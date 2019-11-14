@@ -7,6 +7,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -33,13 +34,13 @@ public class HomeActivity extends AppCompatActivity {
    Bitmap bitmapCMND, bitmapSelfie;
    SharedPreferences mPrefs;
 
-//   @SuppressLint("WrongThread")
+   //   @SuppressLint("WrongThread")
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_home);
       mapping();
-      Log.wtf("abc","onCreate");
+      Log.wtf("abc", "onCreate");
       mPrefs = getSharedPreferences("data", MODE_PRIVATE);
 
       if (personalInformation == null) {
@@ -88,31 +89,15 @@ public class HomeActivity extends AppCompatActivity {
          @Override
          public void onClick(View view) {
             openCameraFront();
-
          }
       });
    }
 
    private void setupIMG() {
-//      bitmapCMND = loadBitmap("identity");
-      if (bitmapCMND != null) {
-         imgCMND.setImageBitmap(bitmapCMND);
-         imgCMND.setVisibility(View.VISIBLE);
-         tvReIdenty.setVisibility(View.VISIBLE);
-      } else {
-         imgCMND.setVisibility(View.GONE);
-         tvReIdenty.setVisibility(View.GONE);
-      }
-
-//      bitmapSelfie = loadBitmap("selfie");
-      if (bitmapSelfie != null) {
-         imgSelfie.setImageBitmap(bitmapSelfie);
-         imgSelfie.setVisibility(View.VISIBLE);
-         tvReSelfie.setVisibility(View.VISIBLE);
-      } else {
-         imgSelfie.setVisibility(View.GONE);
-         tvReSelfie.setVisibility(View.GONE);
-      }
+      imgCMND.setVisibility(View.GONE);
+      tvReIdenty.setVisibility(View.GONE);
+      imgSelfie.setVisibility(View.GONE);
+      tvReSelfie.setVisibility(View.GONE);
 
    }
 
@@ -159,10 +144,15 @@ public class HomeActivity extends AppCompatActivity {
          Boolean hasPhoto = data.getBooleanExtra("hasPhoto", false);
          if (hasPhoto) {
             String path = data.getStringExtra("photo");
-            Bitmap bitmapCMND = BitmapFactory.decodeFile(path);
+            bitmapCMND = BitmapFactory.decodeFile(path);
+            new Thread(new Runnable() {
+               @Override
+               public void run() {
+                  saveBitmap(bitmapCMND, "identity");
+               }
+            }).start();
             setIMG(imgCMND, bitmapCMND);
             tvReIdenty.setVisibility(View.VISIBLE);
-//            saveBitmap(bitmapCMND, "identity");
          }
       }
 
@@ -170,10 +160,18 @@ public class HomeActivity extends AppCompatActivity {
          Boolean hasPhoto = data.getBooleanExtra("hasPhoto", false);
          if (hasPhoto) {
             String path = data.getStringExtra("photo");
-            Bitmap bitmapSelfie = BitmapFactory.decodeFile(path);
+            Bitmap bitmap = BitmapFactory.decodeFile(path);
+            Matrix matrix = new Matrix();
+            matrix.postRotate(-90);
+            bitmapSelfie = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            new Thread(new Runnable() {
+               @Override
+               public void run() {
+                  saveBitmap(bitmapSelfie, "selfie");
+               }
+            }).start();
             setIMG(imgSelfie, bitmapSelfie);
             tvReSelfie.setVisibility(View.VISIBLE);
-//            saveBitmap(bitmapSelfie, "selfie");
          }
       }
    }
@@ -221,26 +219,5 @@ public class HomeActivity extends AppCompatActivity {
       byte[] imageAsBytes = Base64.decode(encoded.getBytes(), Base64.DEFAULT);
       Bitmap bm = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
       return bm;
-   }
-
-   @Override
-   protected void onResume() {
-      super.onResume();
-      Log.wtf("abc","onResume");
-
-   }
-
-   @Override
-   protected void onPause() {
-      super.onPause();
-      Log.wtf("abc","onPause");
-
-   }
-
-   @Override
-   protected void onDestroy() {
-      super.onDestroy();
-      Log.wtf("abc","onDestroy");
-
    }
 }
