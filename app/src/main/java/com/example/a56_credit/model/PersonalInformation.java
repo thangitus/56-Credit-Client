@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class PersonalInformation implements Parcelable {
 
-   @SerializedName("FullName")
+   @SerializedName("Fullname")
    String fullName;
 
    @SerializedName("IdentityNumber")
@@ -21,7 +21,10 @@ public class PersonalInformation implements Parcelable {
    @SerializedName("Hometown")
    String homeTown;
 
+   @SerializedName("BuildingNumber")
    String buildingNumber;
+
+   @SerializedName("Wards")
    String wards;
 
    @SerializedName("Province")
@@ -30,51 +33,43 @@ public class PersonalInformation implements Parcelable {
    @SerializedName("District")
    String district;
 
-   @SerializedName("IdentityCardImage")
+   @SerializedName("IDCardImage")
    String identity;
 
    @SerializedName("SelfieImage")
    String selfie;
 
-   public PersonalInformation(String fullName, String idNumber, String birthday, String homeTown, String buildingNumber, String wards, String province, String district) {
+   @SerializedName("PhoneNumber")
+   String phoneNumber;
+
+   public PersonalInformation(String fullName, String idNumber, String birthday, String gender, String homeTown, String buildingNumber, String wards, String province, String district, String identity, String selfie, String phoneNumber) {
       this.fullName = fullName;
       this.idNumber = idNumber;
       this.birthday = birthday;
+      this.gender = gender;
       this.homeTown = homeTown;
       this.buildingNumber = buildingNumber;
       this.wards = wards;
       this.province = province;
       this.district = district;
-   }
-
-   public String getIdentity() {
-      return identity;
-   }
-
-   public void setIdentity(String identity) {
       this.identity = identity;
-   }
-
-   public String getSelfie() {
-      return selfie;
-   }
-
-   public void setSelfie(String selfie) {
       this.selfie = selfie;
+      this.phoneNumber = phoneNumber;
    }
 
    public PersonalInformation() {
-      this.fullName = null;
-      this.idNumber = null;
-      this.birthday = null;
-      this.gender = null;
-      this.homeTown = null;
-      this.buildingNumber = null;
-      this.wards = null;
-      this.province = null;
-      this.district = null;
-      this.identity = null;
-      this.selfie = null;
+      this.fullName = "test";
+      this.idNumber = "test";
+      this.birthday = "test";
+      this.gender = "test";
+      this.homeTown = "test";
+      this.buildingNumber = "test";
+      this.wards = "test";
+      this.province = "test";
+      this.district = "test";
+      this.identity = "test";
+      this.selfie = "test";
+      this.phoneNumber = "test";
    }
 
    protected PersonalInformation(Parcel in) {
@@ -87,6 +82,30 @@ public class PersonalInformation implements Parcelable {
       wards = in.readString();
       province = in.readString();
       district = in.readString();
+      identity = in.readString();
+      selfie = in.readString();
+      phoneNumber = in.readString();
+   }
+
+   @Override
+   public void writeToParcel(Parcel dest, int flags) {
+      dest.writeString(fullName);
+      dest.writeString(idNumber);
+      dest.writeString(birthday);
+      dest.writeString(gender);
+      dest.writeString(homeTown);
+      dest.writeString(buildingNumber);
+      dest.writeString(wards);
+      dest.writeString(province);
+      dest.writeString(district);
+      dest.writeString(identity);
+      dest.writeString(selfie);
+      dest.writeString(phoneNumber);
+   }
+
+   @Override
+   public int describeContents() {
+      return 0;
    }
 
    public static final Creator<PersonalInformation> CREATOR = new Creator<PersonalInformation>() {
@@ -173,21 +192,27 @@ public class PersonalInformation implements Parcelable {
       this.district = district;
    }
 
-   @Override
-   public int describeContents() {
-      return 0;
+   public String getIdentity() {
+      return identity;
    }
 
-   @Override
-   public void writeToParcel(Parcel parcel, int i) {
-      parcel.writeString(fullName);
-      parcel.writeString(idNumber);
-      parcel.writeString(birthday);
-      parcel.writeString(gender);
-      parcel.writeString(homeTown);
-      parcel.writeString(buildingNumber);
-      parcel.writeString(wards);
-      parcel.writeString(province);
-      parcel.writeString(district);
+   public void setIdentity(String identity) {
+      this.identity = identity;
+   }
+
+   public String getSelfie() {
+      return selfie;
+   }
+
+   public void setSelfie(String selfie) {
+      this.selfie = selfie;
+   }
+
+   public String getPhoneNumber() {
+      return phoneNumber;
+   }
+
+   public void setPhoneNumber(String phoneNumber) {
+      this.phoneNumber = phoneNumber;
    }
 }

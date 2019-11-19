@@ -6,11 +6,22 @@
     android:layout_height="match_parent"
     tools:context=".activity.CameraFrontActivity">
 
-
-    <io.fotoapparat.view.CameraView
-        android:id="@+id/camera_front"
+    <io.fotoapparat.facedetector.view.CameraOverlayLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+
+        <io.fotoapparat.view.CameraView
+            android:id="@+id/camera_front"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <io.fotoapparat.facedetector.view.RectanglesView
+            android:id="@+id/rectanglesView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:rectanglesColor="@color/colorAccent"
+            app:rectanglesStrokeWidth="2dp" />
+    </io.fotoapparat.facedetector.view.CameraOverlayLayout>
 
     <View
         android:id="@+id/viewTopFront"

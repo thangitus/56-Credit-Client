@@ -7,10 +7,12 @@
     android:background="@color/colorGrayDark"
     tools:context=".activity.CameraBackActivity">
 
+
+
     <io.fotoapparat.view.CameraView
         android:id="@+id/camera_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
     <View
         android:id="@+id/viewTop"
@@ -99,7 +101,7 @@
         android:layout_height="332dp"
         android:layout_marginEnd="40dp"
         android:layout_marginBottom="35dp"
-        android:scaleType="fitCenter"
+        android:scaleType="fitXY"
         android:src="@drawable/frame_camera"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

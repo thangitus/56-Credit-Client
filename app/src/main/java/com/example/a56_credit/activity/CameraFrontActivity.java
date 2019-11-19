@@ -18,10 +18,14 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import io.fotoapparat.Fotoapparat;
 import io.fotoapparat.error.CameraErrorListener;
 import io.fotoapparat.exception.camera.CameraException;
+import io.fotoapparat.facedetector.Rectangle;
+import io.fotoapparat.facedetector.processor.FaceDetectorProcessor;
+import io.fotoapparat.facedetector.view.RectanglesView;
 import io.fotoapparat.parameter.ScaleType;
 import io.fotoapparat.result.PhotoResult;
 import io.fotoapparat.result.WhenDoneListener;
@@ -40,6 +44,8 @@ public class CameraFrontActivity extends AppCompatActivity {
    ImageView buttonClose;
    CameraView cameraView;
    Fotoapparat fotoapparat;
+   RectanglesView rectanglesView;
+   FaceDetectorProcessor processor;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +81,13 @@ public class CameraFrontActivity extends AppCompatActivity {
             });
          }
       });
+      processor = FaceDetectorProcessor.with(this)
+              .listener(new FaceDetectorProcessor.OnFacesDetectedListener() {
+                 @Override
+                 public void onFacesDetected(List<Rectangle> faces) {
+                    rectanglesView.setRectangles(faces);
+                 }
+              }).build();
       fotoapparat = createFotoapparat();
    }
 
@@ -83,12 +96,14 @@ public class CameraFrontActivity extends AppCompatActivity {
       buttonTakePhoto = findViewById(R.id.buttonTakePicFront);
       buttonClose = findViewById(R.id.buttonCloseFront);
       cameraView = findViewById(R.id.camera_front);
+      rectanglesView = findViewById(R.id.rectanglesView);
    }
 
    private Fotoapparat createFotoapparat() {
       return Fotoapparat
               .with(this)
               .into(cameraView)
+//              .frameProcessor(processor)
               .previewScaleType(ScaleType.CenterCrop)
               .lensPosition(front())
               .logger(loggers(
