@@ -24,5 +24,7 @@
     <string name="notSelected">Chưa chọn</string>
     <string name="done">Xong</string>
     <string name="alignCamera">Căn chỉnh mặt trước thẻ CMND của bạn vào ô bên và chụp ảnh</string>
+    <string name="facebook_app_id">877981735929127</string>
+    <string name="fb_login_protocol_scheme">fb877981735929127</string>
 
 </resources>

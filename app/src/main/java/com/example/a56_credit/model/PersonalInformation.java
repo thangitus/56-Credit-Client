@@ -58,18 +58,18 @@ public class PersonalInformation implements Parcelable {
    }
 
    public PersonalInformation() {
-      this.fullName = "test";
-      this.idNumber = "test";
-      this.birthday = "test";
-      this.gender = "test";
-      this.homeTown = "test";
-      this.buildingNumber = "test";
-      this.wards = "test";
-      this.province = "test";
-      this.district = "test";
-      this.identity = "test";
-      this.selfie = "test";
-      this.phoneNumber = "test";
+      this.fullName = null;
+      this.idNumber = null;
+      this.birthday = null;
+      this.gender = null;
+      this.homeTown = null;
+      this.buildingNumber = null;
+      this.wards = null;
+      this.province = null;
+      this.district = null;
+      this.identity = null;
+      this.selfie = null;
+      this.phoneNumber = null;
    }
 
    protected PersonalInformation(Parcel in) {

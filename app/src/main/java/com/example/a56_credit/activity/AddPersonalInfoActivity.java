@@ -1,8 +1,5 @@
 package com.example.a56_credit.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -20,15 +17,31 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import com.example.a56_credit.R;
 import com.example.a56_credit.model.City;
 import com.example.a56_credit.model.ListCity;
 import com.example.a56_credit.model.PersonalInformation;
 import com.example.a56_credit.network.APIDatabase;
 import com.example.a56_credit.network.NetworkProviderDatabase;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.ParseException;
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,15 +54,16 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class AddPersonalInfoActivity extends AppCompatActivity {
-   private static final int REQUEST_CODE = 1;
+   private static final String TAG = "AddPersonalInfoActivity";
 
-   EditText edtFullName, edtIdNumber, edtBirthday, edtBuildingNumber, edtWards;
+   EditText edtFullName, edtIdNumber, edtBuildingNumber, edtWards;
    TextView tvChoiceHomeTown, tvChoiceProvince, tvChoiceDistrict;
-   TextView tvHomeTown, tvProvince, tvDistrict;
+   TextView tvHomeTown, tvProvince, tvDistrict, tvBirthday;
    ConstraintLayout layoutFillBirthdayInput;
    RadioGroup radioGroupGender;
    RadioButton radioButtonMale, radioButtonFemale;
-   ImageButton imgCalendar;
+   ImageButton imgCalendar, buttonBack;
+   LoginButton loginButton;
    Button buttonDone;
    Intent intent;
    Calendar myCalendar;
@@ -58,21 +72,31 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    APIDatabase apiDatabase;
    List<String> tittleCityList, tittleDistrictList;
    PersonalInformation personalInformation;
+   CallbackManager callbackManager;
+   AccessToken accessToken;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_add_personal_info);
       mapping();
-      changeBackground();
       sendDatabaseRequestCity();
       intent = getIntent();
+      login();
       Boolean isEdit = intent.getExtras().getBoolean("isEdit");
       if (isEdit) {
          personalInformation = intent.getParcelableExtra("info");
          setData(personalInformation);
-      }
-      personalInformation = new PersonalInformation();
+      } else personalInformation = new PersonalInformation();
+      buttonBack.setOnClickListener(new View.OnClickListener() {
+         @Override
+         public void onClick(View v) {
+            intent.putExtra("hasData", false);
+            setResult(Activity.RESULT_OK, intent);
+            finish();
+         }
+      });
+
       imgCalendar.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
@@ -116,6 +140,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
          public void onClick(View view) {
             getData();
             if (checkData(personalInformation)) {
+               intent.putExtra("hasData", true);
                intent.putExtra("info", personalInformation);
                setResult(Activity.RESULT_OK, intent);
                finish();
@@ -128,7 +153,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    private void mapping() {
       edtFullName = findViewById(R.id.editTextFillFullName);
       edtIdNumber = findViewById(R.id.editTextFillIdNumber);
-      edtBirthday = findViewById(R.id.editTextFillBirthday);
+      tvBirthday = findViewById(R.id.textViewFillBirthday);
       edtBuildingNumber = findViewById(R.id.editTextFillBuildingNumber);
       edtWards = findViewById(R.id.editTextFillWards);
       layoutFillBirthdayInput = findViewById(R.id.linearFillBirthdayInput);
@@ -143,30 +168,24 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       buttonDone = findViewById(R.id.buttonDone);
       radioButtonMale = findViewById(R.id.radioButtonMale);
       radioButtonFemale = findViewById(R.id.radioButtonFemale);
+      buttonBack = findViewById(R.id.buttonBack);
+      loginButton = findViewById(R.id.buttonLogin);
    }
 
    private void setData(PersonalInformation personalInformation) {
-      edtFullName.setText(personalInformation.getFullName());
+      edtFullName.setText(personalInformation.getFullName().toUpperCase());
       edtIdNumber.setText(personalInformation.getIdNumber());
       edtWards.setText(personalInformation.getWards());
       edtBuildingNumber.setText(personalInformation.getBuildingNumber());
-      edtBirthday.setText(personalInformation.getBirthday());
+      tvBirthday.setText(personalInformation.getBirthday());
       tvHomeTown.setText(personalInformation.getHomeTown());
       tvDistrict.setText(personalInformation.getDistrict());
       tvProvince.setText(personalInformation.getProvince());
-      if (personalInformation.getGender().equals("Nam"))
+      if (personalInformation.getGender().equals("Nam") || personalInformation.getGender().equals("male"))
          radioButtonMale.setChecked(true);
       else radioButtonFemale.setChecked(true);
    }
 
-   private void changeBackground() {
-      edtBirthday.setFocusable(false);
-      edtFullName.getBackground().setAlpha(40);
-      edtIdNumber.getBackground().setAlpha(40);
-      layoutFillBirthdayInput.getBackground().setAlpha(40);
-      edtBuildingNumber.getBackground().setAlpha(40);
-      edtWards.getBackground().setAlpha(40);
-   }
 
    private void datePicker() {
       myCalendar = Calendar.getInstance();
@@ -181,7 +200,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
             myCalendar.set(Calendar.DAY_OF_MONTH, i2);
             String myFormat = "dd-MM-yyyy";
             SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-            edtBirthday.setText(sdf.format(myCalendar.getTime()));
+            tvBirthday.setText(sdf.format(myCalendar.getTime()));
          }
       }, year, month, day);
       datePickerDialog.show();
@@ -302,7 +321,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       String idNumber, fullName, birthday, homeTown, buildingNumber, province, district, wards;
       fullName = edtFullName.getText().toString();
       idNumber = edtIdNumber.getText().toString();
-      birthday = edtBirthday.getText().toString();
+      birthday = tvBirthday.getText().toString();
       homeTown = tvHomeTown.getText().toString();
       buildingNumber = edtBuildingNumber.getText().toString();
       wards = edtWards.getText().toString();
@@ -375,5 +394,104 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
          return false;
       }
       return true;
+   }
+
+   private void login() {
+      callbackManager = CallbackManager.Factory.create();
+      final List<String> permissionsList = new ArrayList<>();
+      permissionsList.add("email");
+      permissionsList.add("user_gender");
+      permissionsList.add("user_hometown");
+      permissionsList.add("user_birthday");
+      permissionsList.add("user_location");
+      loginButton.setPermissions(permissionsList);
+      loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+         @Override
+         public void onSuccess(LoginResult loginResult) {
+            accessToken = loginResult.getAccessToken();
+            Log.e(TAG, accessToken.getToken());
+            GraphRequest request = GraphRequest.newMeRequest(
+                    accessToken,
+                    new GraphRequest.GraphJSONObjectCallback() {
+                       @Override
+                       public void onCompleted(JSONObject object, GraphResponse response) {
+                          try {
+                             String birthday = object.getString("birthday");
+                             String inputPattern = "MM/dd/yyyy";
+                             String outputPattern = "dd-MM-yyyy";
+                             SimpleDateFormat inputFormat = new SimpleDateFormat(inputPattern);
+                             SimpleDateFormat outputFormat = new SimpleDateFormat(outputPattern);
+                             Date date;
+                             String str = null;
+                             try {
+                                date = inputFormat.parse(birthday);
+                                str = outputFormat.format(date);
+                             } catch (ParseException e) {
+                                e.printStackTrace();
+                             }
+                             personalInformation.setBirthday(str);
+                             personalInformation.setFullName(object.getString("name"));
+                             personalInformation.setGender(object.getString("gender"));
+                             JSONObject jsonObjectHometown = object.getJSONObject("hometown");
+                             personalInformation.setHomeTown(jsonObjectHometown.getString("name"));
+
+                             JSONObject jsonObjectProvince = object.getJSONObject("location");
+                             String province = jsonObjectProvince.getString("name");
+                             province = province.replace("Thành phố", "TP");
+                             for (int i = 0; i < tittleCityList.size(); i++)
+                                if (tittleCityList.get(i).equals(province)) {
+                                   personalInformation.setProvince(province);
+                                   sendDatabaseRequestDistrict(i + 1);
+                                }
+                             setData(personalInformation);
+                          } catch (JSONException e) {
+                             e.printStackTrace();
+                          }
+                          Log.e(TAG, "Success");
+                       }
+                    });
+
+            Bundle parameters = new Bundle();
+            parameters.putString("fields", "name,address,birthday,hometown,first_name,gender,last_name,name_format,location");
+            request.setParameters(parameters);
+            request.executeAsync();
+         }
+
+         @Override
+         public void onCancel() {
+
+         }
+
+         @Override
+         public void onError(FacebookException error) {
+            Log.wtf("MainActivity: ", "Error");
+         }
+      });
+   }
+
+
+   @Override
+   protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+      callbackManager.onActivityResult(requestCode, resultCode, data);
+      super.onActivityResult(requestCode, resultCode, data);
+   }
+
+   public void disconnectFromFacebook() {
+      if (AccessToken.getCurrentAccessToken() == null) {
+         return; // already logged out
+      }
+      new GraphRequest(AccessToken.getCurrentAccessToken(), "/me/permissions/", null, HttpMethod.DELETE, new GraphRequest
+              .Callback() {
+         @Override
+         public void onCompleted(GraphResponse graphResponse) {
+            LoginManager.getInstance().logOut();
+         }
+      }).executeAsync();
+   }
+
+   @Override
+   protected void onDestroy() {
+      disconnectFromFacebook();
+      super.onDestroy();
    }
 }
