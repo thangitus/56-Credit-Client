@@ -26,5 +26,8 @@
     <string name="alignCamera">Căn chỉnh mặt trước thẻ CMND của bạn vào ô bên và chụp ảnh</string>
     <string name="facebook_app_id">877981735929127</string>
     <string name="fb_login_protocol_scheme">fb877981735929127</string>
+    <string name="understood">Đã hiểu</string>
+    <string name="alert_dialog_title">Hãy điền đầy đủ các thông tin trên CMND.\n
+Các thông tin này sẽ được lưu lại và so sánh với ảnh CMND của bạn</string>
 
 </resources>

@@ -1,12 +1,16 @@
 package com.example.a56_credit.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -55,7 +59,6 @@ import retrofit2.Response;
 
 public class AddPersonalInfoActivity extends AppCompatActivity {
    private static final String TAG = "AddPersonalInfoActivity";
-
    EditText edtFullName, edtIdNumber, edtBuildingNumber, edtWards;
    TextView tvChoiceHomeTown, tvChoiceProvince, tvChoiceDistrict;
    TextView tvHomeTown, tvProvince, tvDistrict, tvBirthday;
@@ -74,12 +77,16 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    PersonalInformation personalInformation;
    CallbackManager callbackManager;
    AccessToken accessToken;
+   Boolean isRunningCheckDataEmpty = true;
+   Handler handler;
+   Boolean isDisable = false;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_add_personal_info);
       mapping();
+      showDialog();
       sendDatabaseRequestCity();
       intent = getIntent();
       login();
@@ -87,7 +94,10 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       if (isEdit) {
          personalInformation = intent.getParcelableExtra("info");
          setData(personalInformation);
-      } else personalInformation = new PersonalInformation();
+      } else {
+         personalInformation = new PersonalInformation();
+      }
+      startThreadCheckDataEmpty();
       buttonBack.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View v) {
@@ -138,8 +148,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       buttonDone.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-            getData();
-            if (checkData(personalInformation)) {
+            if (checkLogicData(personalInformation)) {
                intent.putExtra("hasData", true);
                intent.putExtra("info", personalInformation);
                setResult(Activity.RESULT_OK, intent);
@@ -148,6 +157,22 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
          }
       });
 
+   }
+
+   private void showDialog() {
+      LayoutInflater inflater = this.getLayoutInflater();
+      View view = inflater.inflate(R.layout.alert_dialog, null);
+      AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+      Button button = view.findViewById(R.id.buttonUnderstood);
+      dialogBuilder.setView(view);
+      AlertDialog alertDialog = dialogBuilder.create();
+      alertDialog.show();
+      button.setOnClickListener(new View.OnClickListener() {
+         @Override
+         public void onClick(View v) {
+            alertDialog.dismiss();
+         }
+      });
    }
 
    private void mapping() {
@@ -170,6 +195,73 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       radioButtonFemale = findViewById(R.id.radioButtonFemale);
       buttonBack = findViewById(R.id.buttonBack);
       loginButton = findViewById(R.id.buttonLogin);
+   }
+
+   private void disableButtonDone() {
+      buttonDone.getBackground().setAlpha(150);
+      buttonDone.setEnabled(false);
+
+   }
+
+   private void enableButtonDone() {
+      buttonDone.getBackground().setAlpha(255);
+      buttonDone.setEnabled(true);
+   }
+
+   @SuppressLint("HandlerLeak")
+   private void startThreadCheckDataEmpty() {
+      handler = new Handler() {
+         @Override
+         public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Boolean status = (Boolean) msg.obj;
+            Log.d(TAG, "checkDataEmpty: " + status.toString() + " isDisable  " + isDisable.toString());
+            if (status) {
+               isDisable = false;
+               enableButtonDone();
+            } else if (!isDisable) {
+               isDisable = true;
+               disableButtonDone();
+            }
+         }
+      };
+      new Thread(new Runnable() {
+         @Override
+         public void run() {
+            while (isRunningCheckDataEmpty) {
+               getData();
+               Message msg = handler.obtainMessage(1, checkDataEmpty());
+               handler.sendMessage(msg);
+               try {
+                  Thread.sleep(1000);
+               } catch (InterruptedException e) {
+                  e.printStackTrace();
+               }
+            }
+         }
+      }).start();
+   }
+
+   private Boolean checkDataEmpty() {
+      if (personalInformation.getFullName().equals(""))
+         return false;
+      if (personalInformation.getIdNumber().equals(""))
+         return false;
+      if (personalInformation.getBirthday().equals(""))
+         return false;
+      if (personalInformation.getGender().equals(""))
+         return false;
+      if (personalInformation.getHomeTown().equals(""))
+         return false;
+      if (personalInformation.getBuildingNumber().equals(""))
+         return false;
+      if (personalInformation.getWards().equals(""))
+         return false;
+      if (personalInformation.getProvince().equals(""))
+         return false;
+      if (personalInformation.getDistrict().equals(""))
+         return false;
+      return true;
    }
 
    private void setData(PersonalInformation personalInformation) {
@@ -315,6 +407,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       });
       AlertDialog dialog = builder.create();
       dialog.show();
+      checkDataEmpty();
    }
 
    private void getData() {
@@ -337,60 +430,82 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       personalInformation.setDistrict(district);
    }
 
-   private Boolean checkData(PersonalInformation personalInformation) {
-      if (personalInformation.getFullName().equals("")) {
-         Toast.makeText(this, "Bạn chưa nhập họ tên", Toast.LENGTH_SHORT).show();
-         return false;
-      }
-      if (personalInformation.getIdNumber().equals("")) {
-         Toast.makeText(this, "Bạn chưa nhập số CMND", Toast.LENGTH_SHORT).show();
-         return false;
-      } else if (personalInformation.getIdNumber().length() < 9) {
+   //   private Boolean checkData(PersonalInformation personalInformation) {
+//      if (personalInformation.getFullName().equals("")) {
+//         Toast.makeText(this, "Bạn chưa nhập họ tên", Toast.LENGTH_SHORT).show();
+//         return false;
+//      }
+//      if (personalInformation.getIdNumber().equals("")) {
+//         Toast.makeText(this, "Bạn chưa nhập số CMND", Toast.LENGTH_SHORT).show();
+//         return false;
+//      } else if (personalInformation.getIdNumber().length() < 9) {
+//         Toast.makeText(this, "Số CMND không hợp lệ", Toast.LENGTH_SHORT).show();
+//         return false;
+//      }
+//      if (personalInformation.getBirthday().equals("")) {
+//         Toast.makeText(this, "Bạn chưa chọn ngày sinh", Toast.LENGTH_SHORT).show();
+//         return false;
+//      } else {
+//         String[] parts = personalInformation.getBirthday().split("-");
+//         Calendar cNow = Calendar.getInstance();
+//         int year, month, date;
+//         date = Integer.parseInt(parts[0]);
+//         month = Integer.parseInt(parts[1]);
+//         year = Integer.parseInt(parts[2]);
+//         int old = cNow.get(Calendar.YEAR) - year;
+//         if (month > cNow.get(Calendar.MONTH) ||
+//                 (month == cNow.get(Calendar.MONTH)) && date > cNow.get(Calendar.DATE))
+//            old--;
+//         if (old < 18) {
+//            Toast.makeText(this, "Bạn chưa đủ 18 tuổi", Toast.LENGTH_SHORT).show();
+//            return false;
+//         }
+//      }
+//
+//      if (personalInformation.getGender() == null) {
+//         Toast.makeText(this, "Bạn chưa chọn giới tính", Toast.LENGTH_SHORT).show();
+//         return false;
+//      }
+//      if (personalInformation.getHomeTown().equals("Chưa chọn")) {
+//         Toast.makeText(this, "Bạn chưa chọn nguyên quán", Toast.LENGTH_SHORT).show();
+//         return false;
+//      }
+//      if (personalInformation.getBuildingNumber().equals("")) {
+//         Toast.makeText(this, "Bạn chưa nhập số nhà & tên đường", Toast.LENGTH_SHORT).show();
+//         return false;
+//      }
+//      if (personalInformation.getWards().equals("")) {
+//         Toast.makeText(this, "Bạn chưa nhập phường/xã", Toast.LENGTH_SHORT).show();
+//         return false;
+//      }
+//      if (personalInformation.getProvince().equals("Chưa chọn")) {
+//         Toast.makeText(this, "Bạn chưa chọn tỉnh/thành phố", Toast.LENGTH_SHORT).show();
+//         return false;
+//      }
+//      if (personalInformation.getDistrict().equals("Chưa chọn")) {
+//         Toast.makeText(this, "Bạn chưa chọn quận/huyện", Toast.LENGTH_SHORT).show();
+//         return false;
+//      }
+//      return true;
+//   }
+   private Boolean checkLogicData(PersonalInformation personalInformation) {
+      if (personalInformation.getIdNumber().length() < 9) {
          Toast.makeText(this, "Số CMND không hợp lệ", Toast.LENGTH_SHORT).show();
          return false;
       }
-      if (personalInformation.getBirthday().equals("")) {
-         Toast.makeText(this, "Bạn chưa chọn ngày sinh", Toast.LENGTH_SHORT).show();
-         return false;
-      } else {
-         String[] parts = personalInformation.getBirthday().split("-");
-         Calendar cNow = Calendar.getInstance();
-         int year, month, date;
-         date = Integer.parseInt(parts[0]);
-         month = Integer.parseInt(parts[1]);
-         year = Integer.parseInt(parts[2]);
-         int old = cNow.get(Calendar.YEAR) - year;
-         if (month > cNow.get(Calendar.MONTH) ||
-                 (month == cNow.get(Calendar.MONTH)) && date > cNow.get(Calendar.DATE))
-            old--;
-         if (old < 18) {
-            Toast.makeText(this, "Bạn chưa đủ 18 tuổi", Toast.LENGTH_SHORT).show();
-            return false;
-         }
-      }
 
-      if (personalInformation.getGender() == null) {
-         Toast.makeText(this, "Bạn chưa chọn giới tính", Toast.LENGTH_SHORT).show();
-         return false;
-      }
-      if (personalInformation.getHomeTown().equals("Chưa chọn")) {
-         Toast.makeText(this, "Bạn chưa chọn nguyên quán", Toast.LENGTH_SHORT).show();
-         return false;
-      }
-      if (personalInformation.getBuildingNumber().equals("")) {
-         Toast.makeText(this, "Bạn chưa nhập số nhà & tên đường", Toast.LENGTH_SHORT).show();
-         return false;
-      }
-      if (personalInformation.getWards().equals("")) {
-         Toast.makeText(this, "Bạn chưa nhập phường/xã", Toast.LENGTH_SHORT).show();
-         return false;
-      }
-      if (personalInformation.getProvince().equals("Chưa chọn")) {
-         Toast.makeText(this, "Bạn chưa chọn tỉnh/thành phố", Toast.LENGTH_SHORT).show();
-         return false;
-      }
-      if (personalInformation.getDistrict().equals("Chưa chọn")) {
-         Toast.makeText(this, "Bạn chưa chọn quận/huyện", Toast.LENGTH_SHORT).show();
+      String[] parts = personalInformation.getBirthday().split("-");
+      Calendar cNow = Calendar.getInstance();
+      int year, month, date;
+      date = Integer.parseInt(parts[0]);
+      month = Integer.parseInt(parts[1]);
+      year = Integer.parseInt(parts[2]);
+      int old = cNow.get(Calendar.YEAR) - year;
+      if (month > cNow.get(Calendar.MONTH) ||
+              (month == cNow.get(Calendar.MONTH)) && date > cNow.get(Calendar.DATE))
+         old--;
+      if (old < 18) {
+         Toast.makeText(this, "Bạn chưa đủ 18 tuổi", Toast.LENGTH_SHORT).show();
          return false;
       }
       return true;
@@ -492,6 +607,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    @Override
    protected void onDestroy() {
       disconnectFromFacebook();
+      isRunningCheckDataEmpty = false;
       super.onDestroy();
    }
 }

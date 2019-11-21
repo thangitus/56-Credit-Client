@@ -40,12 +40,14 @@ public class HomeActivity extends AppCompatActivity {
    Intent intentToAddInfo, intentCameraBack, intentCameraFront;
    ImageView imgCMND, imgSelfie;
    Bitmap bitmapCMND, bitmapSelfie;
+   int step = 0;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_home);
       mapping();
+      disableButtonSend();
       if (personalInformation == null) {
          constraintLayoutAddInfo.setVisibility(View.GONE);
          tvButtonEdit.setVisibility(View.GONE);
@@ -56,7 +58,7 @@ public class HomeActivity extends AppCompatActivity {
       constraintLayoutInfo.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-            if (personalInformation.getIdNumber() == null) {
+            if (personalInformation.getIdNumber().equals("") ) {
                intentToAddInfo.putExtra("isEdit", false);
                startActivityForResult(intentToAddInfo, REQUEST_CODE_INFO);
             }
@@ -65,6 +67,7 @@ public class HomeActivity extends AppCompatActivity {
       tvButtonEdit.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
+            step--;
             editInfo();
          }
       });
@@ -78,6 +81,7 @@ public class HomeActivity extends AppCompatActivity {
       tvReIdenty.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
+            step--;
             openCameraBack();
          }
       });
@@ -91,6 +95,7 @@ public class HomeActivity extends AppCompatActivity {
       tvReSelfie.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
+            step--;
             openCameraFront();
          }
       });
@@ -116,6 +121,16 @@ public class HomeActivity extends AppCompatActivity {
       img.setVisibility(View.VISIBLE);
    }
 
+   private void disableButtonSend() {
+      buttonSend.getBackground().setAlpha(150);
+      buttonSend.setEnabled(false);
+
+   }
+
+   private void enableButtonSend() {
+      buttonSend.getBackground().setAlpha(255);
+      buttonSend.setEnabled(true);
+   }
 
    private void mapping() {
       constraintLayoutCMND = findViewById(R.id.layoutCMND);
@@ -149,6 +164,9 @@ public class HomeActivity extends AppCompatActivity {
       if ((requestCode == REQUEST_CODE_INFO) && (resultCode == Activity.RESULT_OK)) {
          if (data.getBooleanExtra("hasData", false)) {
             personalInformation = data.getParcelableExtra("info");
+            step++;
+            if (step == 3)
+               enableButtonSend();
             setInfo();
          }
       }
@@ -162,6 +180,9 @@ public class HomeActivity extends AppCompatActivity {
                @Override
                public void run() {
                   saveBitmap(bitmapCMND, "identity");
+                  step++;
+                  if (step == 3)
+                     enableButtonSend();
                }
             }).start();
             setIMG(imgCMND, bitmapCMND);
@@ -181,6 +202,9 @@ public class HomeActivity extends AppCompatActivity {
                @Override
                public void run() {
                   saveBitmap(bitmapSelfie, "selfie");
+                  step++;
+                  if (step == 3)
+                     enableButtonSend();
                }
             }).start();
             setIMG(imgSelfie, bitmapSelfie);
@@ -245,7 +269,6 @@ public class HomeActivity extends AppCompatActivity {
          @Override
          public void onFailure(Call<ServerResponse> call, Throwable t) {
             Log.wtf("HomeActivity", "onFailure");
-
          }
       });
    }
