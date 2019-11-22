@@ -47,7 +47,7 @@ dependencies {
 
     implementation 'io.fotoapparat:fotoapparat:2.7.0'
     implementation 'io.fotoapparat:facedetector:1.0.0'
-    implementation 'com.facebook.android:facebook-login:[5,6)'
+    implementation 'com.facebook.android:facebook-login:5.11.0'
     implementation 'com.airbnb.android:lottie:3.2.2'
     implementation 'com.asksira.android:loopingviewpager:1.2.0'
     implementation 'com.romandanylyk:pageindicatorview:1.0.3'

@@ -10,18 +10,28 @@
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        app:autoScroll="true"
-        app:isInfinite="true"
         android:layout_marginBottom="40dp"
+        android:clipToPadding="false"
+        app:isInfinite="true"
         app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:scrollInterval="5000" />
 
+    <TextView
+        android:id="@+id/tvSkip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="@string/skip"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textColor="@color/colorGreenLight"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.rd.PageIndicatorView
-        app:piv_radius="8dp"
         android:id="@+id/indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,6 +42,7 @@
         app:piv_animationDuration="3000"
         app:piv_animationType="worm"
         app:piv_interactiveAnimation="true"
+        app:piv_radius="8dp"
         app:piv_selectedColor="@color/colorGreenLight"
         app:piv_unselectedColor="@color/colorGrayDark" />
 

@@ -29,5 +29,7 @@
     <string name="understood">Đã hiểu</string>
     <string name="alert_dialog_title">Hãy điền đầy đủ các thông tin trên CMND.\n
 Các thông tin này sẽ được lưu lại và so sánh với ảnh CMND của bạn</string>
+    <string name="skip">Bỏ qua</string>
+    <string name="understand">Đã hiểu</string>
 
 </resources>

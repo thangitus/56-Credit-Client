@@ -1,14 +1,19 @@
 package com.example.a56_credit.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.a56_credit.R;
 
@@ -40,18 +45,20 @@ import static io.fotoapparat.selector.LensPositionSelectorsKt.front;
 import static io.fotoapparat.selector.ResolutionSelectorsKt.highestResolution;
 
 public class CameraFrontActivity extends AppCompatActivity {
+   private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1;
    ImageButton buttonTakePhoto;
    ImageView buttonClose;
    CameraView cameraView;
    Fotoapparat fotoapparat;
    RectanglesView rectanglesView;
    FaceDetectorProcessor processor;
+   Intent intent;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_camera_front);
-      final Intent intent;
+
       intent = getIntent();
       mapping();
 
@@ -89,6 +96,7 @@ public class CameraFrontActivity extends AppCompatActivity {
                  }
               }).build();
       fotoapparat = createFotoapparat();
+      checkPermission();
    }
 
 
@@ -122,15 +130,30 @@ public class CameraFrontActivity extends AppCompatActivity {
               .build();
    }
 
-   @Override
-   protected void onStart() {
-      super.onStart();
-      fotoapparat.start();
-   }
 
    @Override
    protected void onPause() {
       super.onPause();
       fotoapparat.stop();
+   }
+
+   private void checkPermission() {
+      if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
+      } else {
+         fotoapparat.start();
+      }
+   }
+
+   @Override
+   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+      super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+      if (requestCode == MY_PERMISSIONS_REQUEST_CAMERA && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+         fotoapparat.start();
+      } else {
+         intent.putExtra("hasPhoto", false);
+         setResult(Activity.RESULT_OK, intent);
+         finish();
+      }
    }
 }
