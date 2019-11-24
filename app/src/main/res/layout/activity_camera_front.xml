@@ -15,12 +15,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <io.fotoapparat.facedetector.view.RectanglesView
-            android:id="@+id/rectanglesView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:rectanglesColor="@color/colorAccent"
-            app:rectanglesStrokeWidth="2dp" />
     </io.fotoapparat.facedetector.view.CameraOverlayLayout>
 
     <View

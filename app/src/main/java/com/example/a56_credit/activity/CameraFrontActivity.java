@@ -4,7 +4,9 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -16,6 +18,17 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.a56_credit.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.ml.vision.FirebaseVision;
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
+import com.google.firebase.ml.vision.common.FirebaseVisionPoint;
+import com.google.firebase.ml.vision.face.FirebaseVisionFace;
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
+import com.google.firebase.ml.vision.objects.FirebaseVisionObjectDetectorOptions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,10 +41,10 @@ import java.util.List;
 import io.fotoapparat.Fotoapparat;
 import io.fotoapparat.error.CameraErrorListener;
 import io.fotoapparat.exception.camera.CameraException;
-import io.fotoapparat.facedetector.Rectangle;
 import io.fotoapparat.facedetector.processor.FaceDetectorProcessor;
-import io.fotoapparat.facedetector.view.RectanglesView;
 import io.fotoapparat.parameter.ScaleType;
+import io.fotoapparat.preview.Frame;
+import io.fotoapparat.preview.FrameProcessor;
 import io.fotoapparat.result.PhotoResult;
 import io.fotoapparat.result.WhenDoneListener;
 import io.fotoapparat.view.CameraView;
@@ -46,11 +59,13 @@ import static io.fotoapparat.selector.ResolutionSelectorsKt.highestResolution;
 
 public class CameraFrontActivity extends AppCompatActivity {
    private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1;
+   private static final String TAG = "CameraFrontActivity---";
+   private static final String MY_CAMERA_ID = "my_camera_id";
+
    ImageButton buttonTakePhoto;
    ImageView buttonClose;
    CameraView cameraView;
    Fotoapparat fotoapparat;
-   RectanglesView rectanglesView;
    FaceDetectorProcessor processor;
    Intent intent;
 
@@ -88,13 +103,6 @@ public class CameraFrontActivity extends AppCompatActivity {
             });
          }
       });
-      processor = FaceDetectorProcessor.with(this)
-              .listener(new FaceDetectorProcessor.OnFacesDetectedListener() {
-                 @Override
-                 public void onFacesDetected(List<Rectangle> faces) {
-                    rectanglesView.setRectangles(faces);
-                 }
-              }).build();
       fotoapparat = createFotoapparat();
       checkPermission();
    }
@@ -104,14 +112,18 @@ public class CameraFrontActivity extends AppCompatActivity {
       buttonTakePhoto = findViewById(R.id.buttonTakePicFront);
       buttonClose = findViewById(R.id.buttonCloseFront);
       cameraView = findViewById(R.id.camera_front);
-      rectanglesView = findViewById(R.id.rectanglesView);
    }
 
    private Fotoapparat createFotoapparat() {
       return Fotoapparat
               .with(this)
               .into(cameraView)
-//              .frameProcessor(processor)
+              .frameProcessor(new FrameProcessor() {
+                 @Override
+                 public void process(@NotNull Frame frame) {
+                    faceOptions(frame);
+                 }
+              })
               .previewScaleType(ScaleType.CenterCrop)
               .lensPosition(front())
               .logger(loggers(
@@ -156,4 +168,78 @@ public class CameraFrontActivity extends AppCompatActivity {
          finish();
       }
    }
+
+   private FirebaseVisionImage getVisionImageFromFrame(Frame frame) {
+      byte[] bytes = frame.getImage();
+      FirebaseVisionImageMetadata metadata = new FirebaseVisionImageMetadata.Builder()
+              .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
+              .setRotation(FirebaseVisionImageMetadata.ROTATION_270)
+              .setHeight(frame.getSize().height)
+              .setWidth(frame.getSize().width)
+              .build();
+
+      FirebaseVisionImage image = FirebaseVisionImage.fromByteArray(bytes, metadata);
+      return image;
+   }
+
+   private void faceOptions(Frame frame) {
+      FirebaseVisionFaceDetectorOptions realTimeOpts =
+              new FirebaseVisionFaceDetectorOptions.Builder()
+                      .setPerformanceMode(FirebaseVisionObjectDetectorOptions.STREAM_MODE)
+                      .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
+                      .setContourMode(FirebaseVisionFaceDetectorOptions.ALL_CONTOURS)
+                      .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
+                      .build();
+      FirebaseVisionFaceDetector detector = FirebaseVision.getInstance()
+              .getVisionFaceDetector(realTimeOpts);
+      detector.detectInImage(getVisionImageFromFrame(frame))
+              .addOnSuccessListener(
+                      new OnSuccessListener<List<FirebaseVisionFace>>() {
+                         @Override
+                         public void onSuccess(List<FirebaseVisionFace> faces) {
+                            // Task completed successfully
+                            // [START_EXCLUDE]
+                            // [START get_face_info]
+                            for (FirebaseVisionFace face : faces) {
+                               Rect bounds = face.getBoundingBox();
+                               float rotY = face.getHeadEulerAngleY();  // Head is rotated to the right rotY degrees
+                               float rotZ = face.getHeadEulerAngleZ();  // Head is tilted sideways rotZ degrees
+                               Log.wtf(TAG, "Z: " + rotZ + "     Y: " + rotY);
+                               // If landmark detection was enabled (mouth, ears, eyes, cheeks, and
+                               // nose available):
+                               FirebaseVisionFaceLandmark leftEar = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EAR);
+                               if (leftEar != null) {
+                                  FirebaseVisionPoint leftEarPos = leftEar.getPosition();
+                               }
+
+                               // If classification was enabled:
+                               if (face.getSmilingProbability() != FirebaseVisionFace.UNCOMPUTED_PROBABILITY) {
+                                  float smileProb = face.getSmilingProbability();
+                                  Log.wtf(TAG, "Smile: " + smileProb);
+                               }
+                               if (face.getRightEyeOpenProbability() != FirebaseVisionFace.UNCOMPUTED_PROBABILITY) {
+                                  float rightEyeOpenProb = face.getRightEyeOpenProbability();
+//                                  Log.wtf(TAG, "Right Eye Open: " + rightEyeOpenProb);
+
+                               }
+
+                               // If face tracking was enabled:
+                               if (face.getTrackingId() != FirebaseVisionFace.INVALID_ID) {
+                                  int id = face.getTrackingId();
+                               }
+
+                            }
+                         }
+                      })
+              .addOnFailureListener(
+                      new OnFailureListener() {
+                         @Override
+                         public void onFailure(@NonNull Exception e) {
+                            Log.wtf("FrontCamera", "onFailure");
+                            // Task failed with an exception
+                            // ...
+                         }
+                      });
+   }
+
 }

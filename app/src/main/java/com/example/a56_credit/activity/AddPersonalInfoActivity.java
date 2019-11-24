@@ -85,6 +85,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_add_personal_info);
+      disconnectFromFacebook();
       mapping();
       showDialog();
       sendDatabaseRequestCity();
@@ -166,6 +167,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       Button button = view.findViewById(R.id.buttonUnderstood);
       dialogBuilder.setView(view);
       AlertDialog alertDialog = dialogBuilder.create();
+      alertDialog.setCancelable(false);
       alertDialog.show();
       button.setOnClickListener(new View.OnClickListener() {
          @Override

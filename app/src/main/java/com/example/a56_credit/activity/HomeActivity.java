@@ -1,6 +1,7 @@
 package com.example.a56_credit.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,10 +9,12 @@ import android.graphics.Matrix;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -58,7 +61,7 @@ public class HomeActivity extends AppCompatActivity {
       constraintLayoutInfo.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-            if (personalInformation.getIdNumber().equals("") ) {
+            if (personalInformation.getIdNumber().equals("")) {
                intentToAddInfo.putExtra("isEdit", false);
                startActivityForResult(intentToAddInfo, REQUEST_CODE_INFO);
             }
@@ -122,7 +125,7 @@ public class HomeActivity extends AppCompatActivity {
    }
 
    private void disableButtonSend() {
-      buttonSend.getBackground().setAlpha(150);
+      buttonSend.getBackground().setAlpha(100);
       buttonSend.setEnabled(false);
 
    }
@@ -263,7 +266,8 @@ public class HomeActivity extends AppCompatActivity {
          @Override
          public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
             Log.wtf("HomeActivity", "onResponse");
-            Log.wtf("HomeActivity", "code: " + response.code());
+            Toast.makeText(HomeActivity.this, "" + response.code(), Toast.LENGTH_SHORT).show();
+
          }
 
          @Override
@@ -271,5 +275,16 @@ public class HomeActivity extends AppCompatActivity {
             Log.wtf("HomeActivity", "onFailure");
          }
       });
+   }
+
+   private void showDialogProgress() {
+      LayoutInflater inflater = this.getLayoutInflater();
+      View view = inflater.inflate(R.layout.alert_dialog, null);
+      AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+      dialogBuilder.setView(view);
+      AlertDialog alertDialog = dialogBuilder.create();
+      alertDialog.setCancelable(false);
+      alertDialog.show();
+
    }
 }
