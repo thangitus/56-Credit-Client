@@ -58,7 +58,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class AddPersonalInfoActivity extends AppCompatActivity {
-   private static final String TAG = "AddPersonalInfoActivity";
+   private static final String TAG = "checkDataEmpty";
    EditText edtFullName, edtIdNumber, edtBuildingNumber, edtWards;
    TextView tvChoiceHomeTown, tvChoiceProvince, tvChoiceDistrict;
    TextView tvHomeTown, tvProvince, tvDistrict, tvBirthday;
@@ -94,6 +94,9 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       Boolean isEdit = intent.getExtras().getBoolean("isEdit");
       if (isEdit) {
          personalInformation = intent.getParcelableExtra("info");
+         for (int i = 0; i < tittleCityList.size(); i++)
+            if (tittleCityList.get(i).equals(personalInformation.getProvince()))
+               sendDatabaseRequestDistrict(i + 1);
          setData(personalInformation);
       } else {
          personalInformation = new PersonalInformation();
@@ -253,15 +256,15 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
          return false;
       if (personalInformation.getGender().equals(""))
          return false;
-      if (personalInformation.getHomeTown().equals(""))
+      if (personalInformation.getHomeTown().equals("Chưa chọn"))
          return false;
       if (personalInformation.getBuildingNumber().equals(""))
          return false;
       if (personalInformation.getWards().equals(""))
          return false;
-      if (personalInformation.getProvince().equals(""))
+      if (personalInformation.getProvince().equals("Chưa chọn"))
          return false;
-      if (personalInformation.getDistrict().equals(""))
+      if (personalInformation.getDistrict().equals("Chưa chọn"))
          return false;
       return true;
    }
@@ -550,8 +553,11 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
                              personalInformation.setFullName(object.getString("name"));
                              personalInformation.setGender(object.getString("gender"));
                              JSONObject jsonObjectHometown = object.getJSONObject("hometown");
-                             personalInformation.setHomeTown(jsonObjectHometown.getString("name"));
-
+                             String homeTown = jsonObjectHometown.getString("name");
+                             for (int i = 0; i < tittleCityList.size(); i++)
+                                if (tittleCityList.get(i).equals(homeTown)) {
+                                   personalInformation.setHomeTown(homeTown);
+                                }
                              JSONObject jsonObjectProvince = object.getJSONObject("location");
                              String province = jsonObjectProvince.getString("name");
                              province = province.replace("Thành phố", "TP");

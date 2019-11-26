@@ -1,11 +1,13 @@
 package com.example.a56_credit.activity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
@@ -20,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.a56_credit.R;
 import com.example.a56_credit.model.PersonalInformation;
 import com.example.a56_credit.model.ServerResponse;
@@ -44,6 +47,8 @@ public class HomeActivity extends AppCompatActivity {
    ImageView imgCMND, imgSelfie;
    Bitmap bitmapCMND, bitmapSelfie;
    int step = 0;
+   Dialog dialogUpload;
+   LottieAnimationView lottieAnimationView;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +110,7 @@ public class HomeActivity extends AppCompatActivity {
       buttonSend.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View v) {
+            showDialogProgress();
             sendData(personalInformation);
          }
       });
@@ -183,13 +189,14 @@ public class HomeActivity extends AppCompatActivity {
                @Override
                public void run() {
                   saveBitmap(bitmapCMND, "identity");
-                  step++;
-                  if (step == 3)
-                     enableButtonSend();
                }
             }).start();
+            step++;
+            if (step == 3)
+               enableButtonSend();
             setIMG(imgCMND, bitmapCMND);
             tvReIdenty.setVisibility(View.VISIBLE);
+
          }
       }
 
@@ -200,16 +207,17 @@ public class HomeActivity extends AppCompatActivity {
             Bitmap bitmap = BitmapFactory.decodeFile(path);
             Matrix matrix = new Matrix();
             matrix.postRotate(-90);
+            matrix.preScale(1, -1);
             bitmapSelfie = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
             new Thread(new Runnable() {
                @Override
                public void run() {
                   saveBitmap(bitmapSelfie, "selfie");
-                  step++;
-                  if (step == 3)
-                     enableButtonSend();
                }
             }).start();
+            step++;
+            if (step == 3)
+               enableButtonSend();
             setIMG(imgSelfie, bitmapSelfie);
             tvReSelfie.setVisibility(View.VISIBLE);
          }
@@ -239,7 +247,7 @@ public class HomeActivity extends AppCompatActivity {
    }
 
    private void saveBitmap(Bitmap bitmap, String key) {
-      Log.wtf("HomeActivity", "Save Bitmap Start");
+      Log.wtf("HomeActivity", "Save Bitmap Start " + key);
       bitmap = Bitmap.createScaledBitmap(bitmap, (int) (bitmap.getWidth() * 0.1), (int) (bitmap.getHeight() * 0.1), true);
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
@@ -265,26 +273,30 @@ public class HomeActivity extends AppCompatActivity {
       call.enqueue(new Callback<ServerResponse>() {
          @Override
          public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
-            Log.wtf("HomeActivity", "onResponse");
-            Toast.makeText(HomeActivity.this, "" + response.code(), Toast.LENGTH_SHORT).show();
-
+            lottieAnimationView.cancelAnimation();
+            dialogUpload.dismiss();
+            Toast.makeText(HomeActivity.this, "" + response.body().getUserId(), Toast.LENGTH_SHORT).show();
          }
 
          @Override
          public void onFailure(Call<ServerResponse> call, Throwable t) {
+            dialogUpload.dismiss();
             Log.wtf("HomeActivity", "onFailure");
          }
       });
+
    }
 
    private void showDialogProgress() {
+      dialogUpload = new Dialog(this);
       LayoutInflater inflater = this.getLayoutInflater();
-      View view = inflater.inflate(R.layout.alert_dialog, null);
-      AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-      dialogBuilder.setView(view);
-      AlertDialog alertDialog = dialogBuilder.create();
-      alertDialog.setCancelable(false);
-      alertDialog.show();
-
+      View view = inflater.inflate(R.layout.upload_dialog, null);
+      dialogUpload.setContentView(view);
+      dialogUpload.setCancelable(false);
+      dialogUpload.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+      lottieAnimationView = view.findViewById(R.id.progressLoading);
+      lottieAnimationView.playAnimation();
+      dialogUpload.show();
    }
+
 }
