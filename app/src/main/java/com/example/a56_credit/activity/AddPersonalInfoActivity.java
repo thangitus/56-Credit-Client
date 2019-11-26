@@ -435,64 +435,6 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       personalInformation.setDistrict(district);
    }
 
-   //   private Boolean checkData(PersonalInformation personalInformation) {
-//      if (personalInformation.getFullName().equals("")) {
-//         Toast.makeText(this, "Bạn chưa nhập họ tên", Toast.LENGTH_SHORT).show();
-//         return false;
-//      }
-//      if (personalInformation.getIdNumber().equals("")) {
-//         Toast.makeText(this, "Bạn chưa nhập số CMND", Toast.LENGTH_SHORT).show();
-//         return false;
-//      } else if (personalInformation.getIdNumber().length() < 9) {
-//         Toast.makeText(this, "Số CMND không hợp lệ", Toast.LENGTH_SHORT).show();
-//         return false;
-//      }
-//      if (personalInformation.getBirthday().equals("")) {
-//         Toast.makeText(this, "Bạn chưa chọn ngày sinh", Toast.LENGTH_SHORT).show();
-//         return false;
-//      } else {
-//         String[] parts = personalInformation.getBirthday().split("-");
-//         Calendar cNow = Calendar.getInstance();
-//         int year, month, date;
-//         date = Integer.parseInt(parts[0]);
-//         month = Integer.parseInt(parts[1]);
-//         year = Integer.parseInt(parts[2]);
-//         int old = cNow.get(Calendar.YEAR) - year;
-//         if (month > cNow.get(Calendar.MONTH) ||
-//                 (month == cNow.get(Calendar.MONTH)) && date > cNow.get(Calendar.DATE))
-//            old--;
-//         if (old < 18) {
-//            Toast.makeText(this, "Bạn chưa đủ 18 tuổi", Toast.LENGTH_SHORT).show();
-//            return false;
-//         }
-//      }
-//
-//      if (personalInformation.getGender() == null) {
-//         Toast.makeText(this, "Bạn chưa chọn giới tính", Toast.LENGTH_SHORT).show();
-//         return false;
-//      }
-//      if (personalInformation.getHomeTown().equals("Chưa chọn")) {
-//         Toast.makeText(this, "Bạn chưa chọn nguyên quán", Toast.LENGTH_SHORT).show();
-//         return false;
-//      }
-//      if (personalInformation.getBuildingNumber().equals("")) {
-//         Toast.makeText(this, "Bạn chưa nhập số nhà & tên đường", Toast.LENGTH_SHORT).show();
-//         return false;
-//      }
-//      if (personalInformation.getWards().equals("")) {
-//         Toast.makeText(this, "Bạn chưa nhập phường/xã", Toast.LENGTH_SHORT).show();
-//         return false;
-//      }
-//      if (personalInformation.getProvince().equals("Chưa chọn")) {
-//         Toast.makeText(this, "Bạn chưa chọn tỉnh/thành phố", Toast.LENGTH_SHORT).show();
-//         return false;
-//      }
-//      if (personalInformation.getDistrict().equals("Chưa chọn")) {
-//         Toast.makeText(this, "Bạn chưa chọn quận/huyện", Toast.LENGTH_SHORT).show();
-//         return false;
-//      }
-//      return true;
-//   }
    private Boolean checkLogicData(PersonalInformation personalInformation) {
       if (personalInformation.getIdNumber().length() < 9) {
          Toast.makeText(this, "Số CMND không hợp lệ", Toast.LENGTH_SHORT).show();

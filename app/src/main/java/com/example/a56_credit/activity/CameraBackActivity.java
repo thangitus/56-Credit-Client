@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.ImageButton;
@@ -18,6 +19,15 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.a56_credit.R;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.ml.common.FirebaseMLException;
+import com.google.firebase.ml.vision.FirebaseVision;
+import com.google.firebase.ml.vision.automl.FirebaseAutoMLLocalModel;
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
+import com.google.firebase.ml.vision.label.FirebaseVisionImageLabel;
+import com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler;
+import com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceAutoMLImageLabelerOptions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,11 +35,14 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import io.fotoapparat.Fotoapparat;
 import io.fotoapparat.error.CameraErrorListener;
 import io.fotoapparat.exception.camera.CameraException;
 import io.fotoapparat.parameter.ScaleType;
+import io.fotoapparat.preview.Frame;
+import io.fotoapparat.preview.FrameProcessor;
 import io.fotoapparat.result.PhotoResult;
 import io.fotoapparat.result.WhenDoneListener;
 import io.fotoapparat.view.CameraView;
@@ -54,6 +67,8 @@ public class CameraBackActivity extends AppCompatActivity {
    CameraView cameraView;
    Fotoapparat fotoapparat;
    Intent intent;
+   long currentTime, prevTime;
+   FirebaseVisionImageLabeler labeler;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +76,7 @@ public class CameraBackActivity extends AppCompatActivity {
       setContentView(R.layout.activity_camera_back);
       intent = getIntent();
       mapping();
+      init();
       setSizeFrame(imgFrame);
       buttonTakePic.setOnClickListener(new View.OnClickListener() {
          @Override
@@ -119,12 +135,6 @@ public class CameraBackActivity extends AppCompatActivity {
    }
 
    @Override
-   protected void onStart() {
-      super.onStart();
-//      fotoapparat.start();
-   }
-
-   @Override
    protected void onPause() {
       super.onPause();
       fotoapparat.stop();
@@ -135,6 +145,16 @@ public class CameraBackActivity extends AppCompatActivity {
               .with(this)
               .into(cameraView)
               .previewScaleType(ScaleType.CenterCrop)
+              .frameProcessor(new FrameProcessor() {
+                 @Override
+                 public void process(@NotNull Frame frame) {
+                    currentTime = System.currentTimeMillis();
+                    if (currentTime - 500 > prevTime) {
+                       mlLable(frame);
+                       prevTime = currentTime;
+                    }
+                 }
+              })
               .lensPosition(back())
               .logger(loggers(
                       logcat(),
@@ -154,8 +174,7 @@ public class CameraBackActivity extends AppCompatActivity {
    private void checkPermission() {
       if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
          ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
-      }
-      else{
+      } else {
          fotoapparat.start();
       }
    }
@@ -172,4 +191,46 @@ public class CameraBackActivity extends AppCompatActivity {
       }
    }
 
+   private FirebaseVisionImage getVisionImageFromFrame(Frame frame) {
+      byte[] bytes = frame.getImage();
+      FirebaseVisionImageMetadata metadata = new FirebaseVisionImageMetadata.Builder()
+              .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
+              .setRotation(FirebaseVisionImageMetadata.ROTATION_270)
+              .setHeight(frame.getSize().height)
+              .setWidth(frame.getSize().width)
+              .build();
+
+      FirebaseVisionImage image = FirebaseVisionImage.fromByteArray(bytes, metadata);
+      return image;
+   }
+
+   private void init() {
+      FirebaseAutoMLLocalModel  localModel = new FirebaseAutoMLLocalModel.Builder()
+              .setAssetFilePath("model/manifest.json")
+              .build();
+      try {
+         FirebaseVisionOnDeviceAutoMLImageLabelerOptions  options =
+                 new FirebaseVisionOnDeviceAutoMLImageLabelerOptions.Builder(localModel)
+                         .setConfidenceThreshold(0.0f)  // Evaluate your model in the Firebase console
+                         .build();
+         labeler = FirebaseVision.getInstance().getOnDeviceAutoMLImageLabeler(options);
+      } catch (FirebaseMLException e) {
+         e.printStackTrace();
+      }
+
+   }
+
+   private void mlLable(Frame frame) {
+      labeler.processImage(getVisionImageFromFrame(frame))
+              .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionImageLabel>>() {
+                 @Override
+                 public void onSuccess(List<FirebaseVisionImageLabel> firebaseVisionImageLabels) {
+                    for (FirebaseVisionImageLabel label : firebaseVisionImageLabels) {
+                       String text = label.getText();
+                       float confidence = label.getConfidence();
+                       Log.e(TAG, text + "  :" + confidence);
+                    }
+                 }
+              });
+   }
 }

@@ -76,7 +76,6 @@
         android:rotation="90"
         android:text="@string/alignCamera"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@color/colorGreenLight"
         app:layout_constraintBottom_toBottomOf="@id/viewRight"
         app:layout_constraintEnd_toEndOf="@id/viewRight"
         app:layout_constraintStart_toStartOf="@id/viewRight"
