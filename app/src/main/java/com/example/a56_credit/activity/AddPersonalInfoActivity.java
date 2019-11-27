@@ -220,7 +220,6 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
          public void handleMessage(Message msg) {
             super.handleMessage(msg);
             Boolean status = (Boolean) msg.obj;
-            Log.d(TAG, "checkDataEmpty: " + status.toString() + " isDisable  " + isDisable.toString());
             if (status) {
                isDisable = false;
                enableButtonDone();

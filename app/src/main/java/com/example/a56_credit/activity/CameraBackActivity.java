@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.ImageButton;
@@ -58,7 +57,7 @@ import static io.fotoapparat.selector.ResolutionSelectorsKt.highestResolution;
 public class CameraBackActivity extends AppCompatActivity {
    private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1;
    private static final String TAG = "CameraBackActivity";
-
+   private static final float MAX_PROP_IDENTITY = 0.7f;
    ImageView imgFrame;
    ImageButton buttonTakePic;
    ImageView buttonClose;
@@ -205,11 +204,11 @@ public class CameraBackActivity extends AppCompatActivity {
    }
 
    private void init() {
-      FirebaseAutoMLLocalModel  localModel = new FirebaseAutoMLLocalModel.Builder()
+      FirebaseAutoMLLocalModel localModel = new FirebaseAutoMLLocalModel.Builder()
               .setAssetFilePath("model/manifest.json")
               .build();
       try {
-         FirebaseVisionOnDeviceAutoMLImageLabelerOptions  options =
+         FirebaseVisionOnDeviceAutoMLImageLabelerOptions options =
                  new FirebaseVisionOnDeviceAutoMLImageLabelerOptions.Builder(localModel)
                          .setConfidenceThreshold(0.0f)  // Evaluate your model in the Firebase console
                          .build();
@@ -225,12 +224,30 @@ public class CameraBackActivity extends AppCompatActivity {
               .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionImageLabel>>() {
                  @Override
                  public void onSuccess(List<FirebaseVisionImageLabel> firebaseVisionImageLabels) {
-                    for (FirebaseVisionImageLabel label : firebaseVisionImageLabels) {
-                       String text = label.getText();
-                       float confidence = label.getConfidence();
-                       Log.e(TAG, text + "  :" + confidence);
+                    FirebaseVisionImageLabel label;
+                    label = firebaseVisionImageLabels.get(0);
+                    String text = label.getText();
+                    float prob = label.getConfidence();
+                    if (text.equals("identity") && prob > MAX_PROP_IDENTITY) {
+                       textViewTittle.setText("Căn chỉnh CMND vào khung và chụp ảnh");
+                       enableButtonTakePic();
+                    } else{
+                       textViewTittle.setText("Không tìm thấy chứng minh nhân dân");
+                       disableButtonTakePic();
                     }
                  }
               });
    }
+
+   private void disableButtonTakePic() {
+      buttonTakePic.setAlpha(0.4f);
+      buttonTakePic.setEnabled(false);
+
+   }
+
+   private void enableButtonTakePic() {
+      buttonTakePic.setAlpha(1f);
+      buttonTakePic.setEnabled(true);
+   }
+
 }

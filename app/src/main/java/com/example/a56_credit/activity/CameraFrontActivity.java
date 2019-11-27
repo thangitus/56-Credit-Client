@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -226,7 +225,6 @@ public class CameraFrontActivity extends AppCompatActivity {
                                textViewNotify.setText("Xoay đầu qua trái");
                                return;
                             }
-                            Log.wtf(TAG, "Y: " + rotY);
                             if (face.getSmilingProbability() != FirebaseVisionFace.UNCOMPUTED_PROBABILITY) {
                                float smileProb = face.getSmilingProbability();
                                if (minSmileProb == 1 || maxSmileProb == 0) {
@@ -249,7 +247,6 @@ public class CameraFrontActivity extends AppCompatActivity {
                       new OnFailureListener() {
                          @Override
                          public void onFailure(@NonNull Exception e) {
-                            Log.wtf("FrontCamera", "onFailure");
                             // Task failed with an exception
                             // ...
                          }
@@ -298,7 +295,7 @@ public class CameraFrontActivity extends AppCompatActivity {
       AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
       Button button = view.findViewById(R.id.buttonUnderstood);
       TextView textView = view.findViewById(R.id.textViewAlert);
-      textView.setText("Quay đầu qua trái, sau đó quay đầu qua phải và cười để chụp ảnh!");
+      textView.setText("Quay đầu qua phải, sau đó quay đầu qua trái và cười để chụp ảnh!");
       dialogBuilder.setView(view);
       AlertDialog alertDialog = dialogBuilder.create();
       alertDialog.setCancelable(false);
@@ -315,11 +312,11 @@ public class CameraFrontActivity extends AppCompatActivity {
    private void showDialogProgress() {
       dialogProgress = new Dialog(this);
       LayoutInflater inflater = this.getLayoutInflater();
-      View view = inflater.inflate(R.layout.upload_dialog, null);
+      View view = inflater.inflate(R.layout.animation_dialog, null);
       dialogProgress.setContentView(view);
       dialogProgress.setCancelable(false);
       dialogProgress.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-      lottieAnimationView = view.findViewById(R.id.progressLoading);
+      lottieAnimationView = view.findViewById(R.id.animationView);
       lottieAnimationView.playAnimation();
       dialogProgress.show();
    }

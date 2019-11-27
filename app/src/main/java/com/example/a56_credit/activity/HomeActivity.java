@@ -1,5 +1,6 @@
 package com.example.a56_credit.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -9,14 +10,14 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,6 +27,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.example.a56_credit.R;
 import com.example.a56_credit.model.PersonalInformation;
 import com.example.a56_credit.model.ServerResponse;
+import com.example.a56_credit.model.StatusResponse;
 import com.example.a56_credit.network.APIServer;
 import com.example.a56_credit.network.ServerNetwork;
 
@@ -38,6 +40,7 @@ import retrofit2.Response;
 public class HomeActivity extends AppCompatActivity {
    private static final int REQUEST_CODE_INFO = 1, REQUEST_CODE_CAMERA_BACK = 2, REQUEST_CODE_CAMERA_FRONT = 3;
    private static final String TAG = "HomeActivity";
+   public static String ID;
    ConstraintLayout constraintLayoutCMND, constraintLayoutAddInfo, constraintLayoutInfo, constraintLayoutSelfie;
    TextView tvFullName, tvIdNumber, tvBirthday, tvBuildingNumber, tvWards, tvProvince, tvDistrict;
    TextView tvButtonEdit, tvReIdenty, tvReSelfie;
@@ -47,8 +50,10 @@ public class HomeActivity extends AppCompatActivity {
    ImageView imgCMND, imgSelfie;
    Bitmap bitmapCMND, bitmapSelfie;
    int step = 0;
-   Dialog dialogUpload;
+   Dialog dialogUpload, dialogResult;
    LottieAnimationView lottieAnimationView;
+   StatusResponse status;
+   Boolean isChecked = false;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +115,7 @@ public class HomeActivity extends AppCompatActivity {
       buttonSend.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View v) {
-            showDialogProgress();
+            showDialogAnimation(R.raw.loading);
             sendData(personalInformation);
          }
       });
@@ -185,15 +190,7 @@ public class HomeActivity extends AppCompatActivity {
          if (hasPhoto) {
             String path = data.getStringExtra("photo");
             bitmapCMND = BitmapFactory.decodeFile(path);
-            new Thread(new Runnable() {
-               @Override
-               public void run() {
-                  saveBitmap(bitmapCMND, "identity");
-               }
-            }).start();
-            step++;
-            if (step == 3)
-               enableButtonSend();
+            startThreadDecodeBitmap(bitmapCMND, "identity");
             setIMG(imgCMND, bitmapCMND);
             tvReIdenty.setVisibility(View.VISIBLE);
 
@@ -209,15 +206,7 @@ public class HomeActivity extends AppCompatActivity {
             matrix.postRotate(-90);
             matrix.preScale(1, -1);
             bitmapSelfie = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            new Thread(new Runnable() {
-               @Override
-               public void run() {
-                  saveBitmap(bitmapSelfie, "selfie");
-               }
-            }).start();
-            step++;
-            if (step == 3)
-               enableButtonSend();
+            startThreadDecodeBitmap(bitmapSelfie, "selfie");
             setIMG(imgSelfie, bitmapSelfie);
             tvReSelfie.setVisibility(View.VISIBLE);
          }
@@ -246,9 +235,8 @@ public class HomeActivity extends AppCompatActivity {
       startActivityForResult(intentCameraFront, REQUEST_CODE_CAMERA_FRONT);
    }
 
-   private void saveBitmap(Bitmap bitmap, String key) {
-      Log.wtf("HomeActivity", "Save Bitmap Start " + key);
-      bitmap = Bitmap.createScaledBitmap(bitmap, (int) (bitmap.getWidth() * 0.1), (int) (bitmap.getHeight() * 0.1), true);
+   private void decodeBitmap(Bitmap bitmap, String key) {
+      bitmap = Bitmap.createScaledBitmap(bitmap, (int) (bitmap.getWidth() * 0.3), (int) (bitmap.getHeight() * 0.3), true);
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
       byte[] bytes = baos.toByteArray();
@@ -257,7 +245,6 @@ public class HomeActivity extends AppCompatActivity {
          personalInformation.setIdentity(encoded);
       else
          personalInformation.setSelfie(encoded);
-      Log.wtf("HomeActivity", "Save Bitmap Done");
    }
 
    private void sendData(PersonalInformation personalInformation) {
@@ -273,30 +260,113 @@ public class HomeActivity extends AppCompatActivity {
       call.enqueue(new Callback<ServerResponse>() {
          @Override
          public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
-            lottieAnimationView.cancelAnimation();
             dialogUpload.dismiss();
-            Toast.makeText(HomeActivity.this, "" + response.body().getUserId(), Toast.LENGTH_SHORT).show();
+            if (response.code() == 200) {
+               ID = response.body().getUserId();
+               startThreadCheckStatus();
+            } else showDialogResult("-1");
          }
 
          @Override
          public void onFailure(Call<ServerResponse> call, Throwable t) {
             dialogUpload.dismiss();
-            Log.wtf("HomeActivity", "onFailure");
          }
       });
 
    }
 
-   private void showDialogProgress() {
+   @SuppressLint("HandlerLeak")
+   private Handler handler = new Handler() {
+      @Override
+      public void handleMessage(Message msg) {
+         super.handleMessage(msg);
+         String type = (String) msg.obj;
+         if (type.equals("decoded")) {
+            step++;
+            if (step == 3)
+               enableButtonSend();
+         }
+      }
+   };
+
+   private void showDialogAnimation(int res) {
       dialogUpload = new Dialog(this);
       LayoutInflater inflater = this.getLayoutInflater();
-      View view = inflater.inflate(R.layout.upload_dialog, null);
+      View view = inflater.inflate(R.layout.animation_dialog, null);
       dialogUpload.setContentView(view);
       dialogUpload.setCancelable(false);
       dialogUpload.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-      lottieAnimationView = view.findViewById(R.id.progressLoading);
+      lottieAnimationView = view.findViewById(R.id.animationView);
+      lottieAnimationView.setAnimation(res);
       lottieAnimationView.playAnimation();
       dialogUpload.show();
    }
 
+   private void startThreadDecodeBitmap(Bitmap bitmap, String key) {
+      new Thread(new Runnable() {
+         @Override
+         public void run() {
+            decodeBitmap(bitmap, key);
+            Message message = handler.obtainMessage(1, "decoded");
+            handler.sendMessage(message);
+         }
+      }).start();
+   }
+
+   private void startThreadCheckStatus() {
+      APIServer apiServer = ServerNetwork.getInstance().getRetrofit().create(APIServer.class);
+      String url = "/status?id=" + ID;
+      new Thread(new Runnable() {
+         @Override
+         public void run() {
+            while (!isChecked) {
+               Call<StatusResponse> call = apiServer.getStatus(url);
+               call.enqueue(new Callback<StatusResponse>() {
+                  @Override
+                  public void onResponse(Call<StatusResponse> call, Response<StatusResponse> response) {
+                     status = response.body();
+                     if (status.getStatus().equals("1") || status.getStatus().equals("-1")) {
+                        isChecked = true;
+                        showDialogResult(status.getStatus());
+                     }
+                  }
+
+                  @Override
+                  public void onFailure(Call<StatusResponse> call, Throwable t) {
+                  }
+               });
+               try {
+                  Thread.sleep(10000);
+               } catch (InterruptedException e) {
+                  e.printStackTrace();
+               }
+            }
+         }
+      }).start();
+   }
+
+   private void showDialogResult(String result) {
+      dialogResult = new Dialog(this);
+      LayoutInflater inflater = this.getLayoutInflater();
+      View view = inflater.inflate(R.layout.result_dialog, null);
+      ImageView imageViewResult = view.findViewById(R.id.iconResult);
+      TextView textViewResult = view.findViewById(R.id.textViewMsg);
+      if (result.equals("1")) {
+         imageViewResult.setImageResource(R.drawable.ic_happy);
+         textViewResult.setText(R.string.msg_success);
+      } else {
+         imageViewResult.setImageResource(R.drawable.ic_sad);
+         textViewResult.setText(R.string.msg_fail);
+      }
+      dialogResult.setContentView(view);
+      dialogResult.setCancelable(false);
+      Button buttonBack = view.findViewById(R.id.buttonBackDialog);
+      buttonBack.setOnClickListener(new View.OnClickListener() {
+         @Override
+         public void onClick(View v) {
+            dialogResult.dismiss();
+         }
+      });
+      dialogResult.show();
+   }
 }

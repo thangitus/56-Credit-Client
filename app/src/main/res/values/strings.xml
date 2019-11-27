@@ -31,5 +31,8 @@
 Các thông tin này sẽ được lưu lại và so sánh với ảnh CMND của bạn</string>
     <string name="skip">Bỏ qua</string>
     <string name="understand">Đã hiểu</string>
+    <string name="msg_fail">Bạn vui lòng kiểm tra lại thông tin và ảnh chụp</string>
+    <string name="msg_success">Bạn đã xác nhận thông tin thành công</string>
+    <string name="back">Trở về</string>
 
 </resources>
