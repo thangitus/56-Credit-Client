@@ -50,11 +50,12 @@ public class HomeActivity extends AppCompatActivity {
    Intent intentToAddInfo, intentCameraBack, intentCameraFront;
    ImageView imgCMND, imgSelfie;
    Bitmap bitmapCMND, bitmapSelfie;
-   int step = 1;
+   int step;
    Dialog dialogUpload, dialogResult;
    LottieAnimationView lottieAnimationView;
    StatusResponse status;
    Boolean isChecked = false;
+   String identity, selfie;
    @SuppressLint("HandlerLeak")
    private Handler handler = new Handler() {
       @Override
@@ -65,6 +66,12 @@ public class HomeActivity extends AppCompatActivity {
             step++;
             if (step == 3)
                enableButtonSend();
+            tvReIdentity.setAlpha(1);
+            tvReIdentity.setEnabled(true);
+            tvReSelfie.setAlpha(1);
+            tvReSelfie.setEnabled(true);
+            Log.wtf(TAG, "End decode");
+
          }
       }
    };
@@ -87,6 +94,7 @@ public class HomeActivity extends AppCompatActivity {
          public void onClick(View view) {
             if (personalInformation.getIdNumber().equals("")) {
                intentToAddInfo.putExtra("isEdit", false);
+               intentToAddInfo.putExtra("info", personalInformation);
                startActivityForResult(intentToAddInfo, REQUEST_CODE_INFO);
             }
          }
@@ -96,7 +104,11 @@ public class HomeActivity extends AppCompatActivity {
          public void onClick(View view) {
             step--;
             disableButtonSend();
-            editInfo();
+            intentToAddInfo.putExtra("isEdit", true);
+            intentToAddInfo.putExtra("info", personalInformation);
+            personalInformation.setIdentity("");
+            personalInformation.setSelfie("");
+            startActivityForResult(intentToAddInfo, REQUEST_CODE_INFO);
          }
       });
       constraintLayoutCMND.setOnClickListener(new View.OnClickListener() {
@@ -182,11 +194,6 @@ public class HomeActivity extends AppCompatActivity {
       buttonSend = findViewById(R.id.buttonSend);
    }
 
-   private void editInfo() {
-      intentToAddInfo.putExtra("isEdit", true);
-      intentToAddInfo.putExtra("info", personalInformation);
-      startActivityForResult(intentToAddInfo, REQUEST_CODE_INFO);
-   }
 
    @Override
    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -258,19 +265,23 @@ public class HomeActivity extends AppCompatActivity {
       byte[] bytes = baos.toByteArray();
       String encoded = Base64.encodeToString(bytes, Base64.NO_WRAP);
       if (key.equals("identity"))
-         personalInformation.setIdentity(encoded);
+         identity = encoded;
+//         personalInformation.setIdentity(encoded);
       else
-         personalInformation.setSelfie(encoded);
+         selfie = encoded;
+//         personalInformation.setSelfie(encoded);
    }
 
    private void sendData(PersonalInformation personalInformation) {
-      personalInformation.setFullName("NGUYỄN VĂN THẮNG");
-      personalInformation.setIdNumber("245401302");
-      personalInformation.setBirthday("20-05-1999");
-      personalInformation.setHomeTown("Nam Định");
-      personalInformation.setProvince("TP Hồ Chí Minh");
-      personalInformation.setDistrict("Quận 8");
-      personalInformation.setPhoneNumber("0352846131");
+//      personalInformation.setFullName("NGUYỄN VĂN THẮNG");
+//      personalInformation.setIdNumber("245401302");
+//      personalInformation.setBirthday("20-05-1999");
+//      personalInformation.setHomeTown("Nam Định");
+//      personalInformation.setProvince("TP Hồ Chí Minh");
+//      personalInformation.setDistrict("Quận 8");
+//      personalInformation.setPhoneNumber("0352846131");
+      personalInformation.setIdentity(identity);
+      personalInformation.setSelfie(selfie);
       APIServer apiServer = ServerNetwork.getInstance().getRetrofit().create(APIServer.class);
       Call<ServerResponse> call = apiServer.sendData(personalInformation);
       call.enqueue(new Callback<ServerResponse>() {
@@ -281,7 +292,8 @@ public class HomeActivity extends AppCompatActivity {
                ID = response.body().getUserId();
                Log.wtf(TAG, ID);
                startThreadCheckStatus();
-            } else showDialogResult("-1");
+            } else
+               showDialogResult("-1");
          }
 
          @Override
@@ -306,6 +318,13 @@ public class HomeActivity extends AppCompatActivity {
    }
 
    private void startThreadDecodeBitmap(Bitmap bitmap, String key) {
+      if (key.equals("identity")) {
+         tvReIdentity.setAlpha(0.5f);
+         tvReIdentity.setEnabled(false);
+      } else {
+         tvReSelfie.setAlpha(0.5f);
+         tvReSelfie.setEnabled(false);
+      }
       new Thread(new Runnable() {
          @Override
          public void run() {
@@ -313,13 +332,14 @@ public class HomeActivity extends AppCompatActivity {
             decodeBitmap(bitmap, key);
             Message message = handler.obtainMessage(1, "decoded");
             handler.sendMessage(message);
-            Log.wtf(TAG, "End decode");
          }
       }).start();
+
    }
 
    private void startThreadCheckStatus() {
       disableButtonSend();
+      isChecked = false;
       APIServer apiServer = ServerNetwork.getInstance().getRetrofit().create(APIServer.class);
       String url = "/status?id=" + ID;
       new Thread(new Runnable() {
@@ -340,10 +360,11 @@ public class HomeActivity extends AppCompatActivity {
 
                   @Override
                   public void onFailure(Call<StatusResponse> call, Throwable t) {
+                     enableButtonSend();
                   }
                });
                try {
-                  Thread.sleep(10000);
+                  Thread.sleep(5000);
                } catch (InterruptedException e) {
                   e.printStackTrace();
                }

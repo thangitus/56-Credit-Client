@@ -101,12 +101,9 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       intent = getIntent();
       login();
       isEdit = intent.getExtras().getBoolean("isEdit");
-      if (isEdit) {
-         personalInformation = intent.getParcelableExtra("info");
-         setData(personalInformation);
-      } else {
-         personalInformation = new PersonalInformation();
-      }
+      personalInformation = intent.getParcelableExtra("info");
+      setData(personalInformation);
+
       startThreadCheckDataEmpty();
       buttonBack.setOnClickListener(new View.OnClickListener() {
          @Override
