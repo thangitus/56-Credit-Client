@@ -50,11 +50,24 @@ public class HomeActivity extends AppCompatActivity {
    Intent intentToAddInfo, intentCameraBack, intentCameraFront;
    ImageView imgCMND, imgSelfie;
    Bitmap bitmapCMND, bitmapSelfie;
-   int step=1;
+   int step = 1;
    Dialog dialogUpload, dialogResult;
    LottieAnimationView lottieAnimationView;
    StatusResponse status;
    Boolean isChecked = false;
+   @SuppressLint("HandlerLeak")
+   private Handler handler = new Handler() {
+      @Override
+      public void handleMessage(Message msg) {
+         super.handleMessage(msg);
+         String type = (String) msg.obj;
+         if (type.equals("decoded")) {
+            step++;
+            if (step == 3)
+               enableButtonSend();
+         }
+      }
+   };
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +137,6 @@ public class HomeActivity extends AppCompatActivity {
          }
       });
    }
-
 
    private void setupIMG() {
       imgCMND.setVisibility(View.GONE);
@@ -280,20 +292,6 @@ public class HomeActivity extends AppCompatActivity {
 
    }
 
-   @SuppressLint("HandlerLeak")
-   private Handler handler = new Handler() {
-      @Override
-      public void handleMessage(Message msg) {
-         super.handleMessage(msg);
-         String type = (String) msg.obj;
-         if (type.equals("decoded")) {
-            step++;
-            if (step == 3)
-               enableButtonSend();
-         }
-      }
-   };
-
    private void showDialogAnimation(int res) {
       dialogUpload = new Dialog(this);
       LayoutInflater inflater = this.getLayoutInflater();
@@ -311,11 +309,11 @@ public class HomeActivity extends AppCompatActivity {
       new Thread(new Runnable() {
          @Override
          public void run() {
-            Log.wtf(TAG,"Start decode");
+            Log.wtf(TAG, "Start decode");
             decodeBitmap(bitmap, key);
             Message message = handler.obtainMessage(1, "decoded");
             handler.sendMessage(message);
-            Log.wtf(TAG,"End decode");
+            Log.wtf(TAG, "End decode");
          }
       }).start();
    }

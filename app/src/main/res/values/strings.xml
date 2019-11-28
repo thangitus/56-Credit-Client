@@ -20,7 +20,7 @@
     <string name="male">Nam</string>
     <string name="female">Nữ</string>
     <string name="choose">Chọn</string>
-    <string name="address">Địa chỉ hiện tại</string>
+    <string name="address">Địa chỉ thường trú</string>
     <string name="notSelected">Chưa chọn</string>
     <string name="done">Xong</string>
     <string name="alignCamera">Căn chỉnh mặt trước thẻ CMND của bạn vào ô bên và chụp ảnh</string>

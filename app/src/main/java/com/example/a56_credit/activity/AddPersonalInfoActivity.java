@@ -461,7 +461,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
          for (int i = 0; i < listCityIdNumber.size(); i++) {
             if (province.equals(listCityIdNumber.get(i).getTittle())) {
                String id = String.valueOf(listCityIdNumber.get(i).getId());
-               String cmp = String.valueOf(personalID.subSequence(0, id.length() - 1));
+               String cmp = String.valueOf(personalID.subSequence(0, id.length()));
                if (!id.equals(cmp)) {
                   Toast.makeText(this, "Số CMND không hợp lệ", Toast.LENGTH_SHORT).show();
                   return false;

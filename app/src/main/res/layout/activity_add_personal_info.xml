@@ -142,14 +142,15 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <ImageButton
+
                         android:id="@+id/imageButtonCalendar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="20dp"
                         android:backgroundTint="#0000"
                         android:scaleType="fitCenter"
-                        android:scaleX="1.5"
-                        android:scaleY="1.5"
+                        android:scaleX="1"
+                        android:scaleY="1"
                         android:src="@drawable/ic_calendar"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -421,7 +422,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
-                android:layout_marginBottom="30dp"
+                android:layout_marginBottom="40dp"
                 android:background="@drawable/border_gradient"
                 android:text="@string/done"
                 android:textAllCaps="false"
