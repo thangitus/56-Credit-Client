@@ -42,9 +42,12 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -71,15 +74,16 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    Intent intent;
    Calendar myCalendar;
    DatePickerDialog datePickerDialog;
+   List<City> listCityIdNumber;
 
    APIDatabase apiDatabase;
-   List<String> tittleCityList, tittleDistrictList;
+   List<String> titleCityList, tittleDistrictList;
    PersonalInformation personalInformation;
    CallbackManager callbackManager;
    AccessToken accessToken;
    Boolean isRunningCheckDataEmpty = true;
    Handler handler;
-   Boolean isDisable = false;
+   Boolean isDisable = false, isEdit;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -89,14 +93,16 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       mapping();
       showDialog();
       sendDatabaseRequestCity();
+      try {
+         createProvinceIdNumber();
+      } catch (JSONException e) {
+         e.printStackTrace();
+      }
       intent = getIntent();
       login();
-      Boolean isEdit = intent.getExtras().getBoolean("isEdit");
+      isEdit = intent.getExtras().getBoolean("isEdit");
       if (isEdit) {
          personalInformation = intent.getParcelableExtra("info");
-         for (int i = 0; i < tittleCityList.size(); i++)
-            if (tittleCityList.get(i).equals(personalInformation.getProvince()))
-               sendDatabaseRequestDistrict(i + 1);
          setData(personalInformation);
       } else {
          personalInformation = new PersonalInformation();
@@ -310,7 +316,13 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
          public void onResponse(Call<ListCity> call, Response<ListCity> response) {
             ListCity listCity;
             listCity = new ListCity(response.body());
-            tittleCityList = createTittleCityList(listCity);
+            titleCityList = createtitleCityList(listCity);
+            if (isEdit) {
+               for (int i = 0; i < titleCityList.size(); i++)
+                  if (titleCityList.get(i).equals(personalInformation.getProvince()))
+                     sendDatabaseRequestDistrict(i + 1);
+               isEdit = false;
+            }
          }
 
          @Override
@@ -338,14 +350,14 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       });
    }
 
-   private List<String> createTittleCityList(ListCity listCity) {
-      List<String> tittleCityList;
-      tittleCityList = new ArrayList<>();
+   private List<String> createtitleCityList(ListCity listCity) {
+      List<String> titleCityList;
+      titleCityList = new ArrayList<>();
       for (int i = 0; i < 63; i++) {
          String tittle = listCity.getCityList().get(i).getTittle();
-         tittleCityList.add(tittle);
+         titleCityList.add(tittle);
       }
-      return tittleCityList;
+      return titleCityList;
    }
 
    private List<String> createTittleDistrictList(List<City> cityList) {
@@ -359,17 +371,17 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    }
 
    private void pickHomeTown() {
-      if (tittleCityList == null) {
+      if (titleCityList == null) {
          Toast.makeText(this, "Vui lòng kiểm tra kết nối internet", Toast.LENGTH_SHORT).show();
          return;
       }
       AlertDialog.Builder builder = new AlertDialog.Builder(this);
       builder.setTitle("Chọn nguyên quán");
-      CharSequence[] cs = tittleCityList.toArray(new CharSequence[tittleCityList.size()]);
+      CharSequence[] cs = titleCityList.toArray(new CharSequence[titleCityList.size()]);
       builder.setItems(cs, new DialogInterface.OnClickListener() {
          @Override
          public void onClick(DialogInterface dialogInterface, int i) {
-            tvHomeTown.setText(tittleCityList.get(i));
+            tvHomeTown.setText(titleCityList.get(i));
          }
       });
       AlertDialog dialog = builder.create();
@@ -377,17 +389,18 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    }
 
    private void pickProvince() {
-      if (tittleCityList == null) {
+      if (titleCityList == null) {
          Toast.makeText(this, "Vui lòng kiểm tra kết nối internet", Toast.LENGTH_SHORT).show();
          return;
       }
       AlertDialog.Builder builder = new AlertDialog.Builder(this);
       builder.setTitle("Chọn tỉnh/thành");
-      CharSequence[] cs = tittleCityList.toArray(new CharSequence[tittleCityList.size()]);
+      CharSequence[] cs = titleCityList.toArray(new CharSequence[titleCityList.size()]);
       builder.setItems(cs, new DialogInterface.OnClickListener() {
          @Override
          public void onClick(DialogInterface dialogInterface, int i) {
-            tvProvince.setText(tittleCityList.get(i));
+            tvProvince.setText(titleCityList.get(i));
+            tvDistrict.setText("Chưa chọn");
             sendDatabaseRequestDistrict(i + 1);
          }
       });
@@ -396,6 +409,10 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    }
 
    private void pickDistrict() {
+      if (tvProvince.getText().toString().equals("Chưa chọn")) {
+         Toast.makeText(this, "Vui lòng chọn tỉnh/thành", Toast.LENGTH_SHORT).show();
+         return;
+      }
       if (tittleDistrictList == null) {
          Toast.makeText(this, "Vui lòng kiểm tra kết nối internet", Toast.LENGTH_SHORT).show();
          return;
@@ -435,9 +452,22 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    }
 
    private Boolean checkLogicData(PersonalInformation personalInformation) {
-      if (personalInformation.getIdNumber().length() < 9) {
+      if (personalInformation.getIdNumber().length() != 9) {
          Toast.makeText(this, "Số CMND không hợp lệ", Toast.LENGTH_SHORT).show();
          return false;
+      } else {
+         String province = personalInformation.getProvince();
+         String personalID = personalInformation.getIdNumber();
+         for (int i = 0; i < listCityIdNumber.size(); i++) {
+            if (province.equals(listCityIdNumber.get(i).getTittle())) {
+               String id = String.valueOf(listCityIdNumber.get(i).getId());
+               String cmp = String.valueOf(personalID.subSequence(0, id.length() - 1));
+               if (!id.equals(cmp)) {
+                  Toast.makeText(this, "Số CMND không hợp lệ", Toast.LENGTH_SHORT).show();
+                  return false;
+               }
+            }
+         }
       }
 
       String[] parts = personalInformation.getBirthday().split("-");
@@ -495,15 +525,15 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
                              personalInformation.setGender(object.getString("gender"));
                              JSONObject jsonObjectHometown = object.getJSONObject("hometown");
                              String homeTown = jsonObjectHometown.getString("name");
-                             for (int i = 0; i < tittleCityList.size(); i++)
-                                if (tittleCityList.get(i).equals(homeTown)) {
+                             for (int i = 0; i < titleCityList.size(); i++)
+                                if (titleCityList.get(i).equals(homeTown)) {
                                    personalInformation.setHomeTown(homeTown);
                                 }
                              JSONObject jsonObjectProvince = object.getJSONObject("location");
                              String province = jsonObjectProvince.getString("name");
                              province = province.replace("Thành phố", "TP");
-                             for (int i = 0; i < tittleCityList.size(); i++)
-                                if (tittleCityList.get(i).equals(province)) {
+                             for (int i = 0; i < titleCityList.size(); i++)
+                                if (titleCityList.get(i).equals(province)) {
                                    personalInformation.setProvince(province);
                                    sendDatabaseRequestDistrict(i + 1);
                                 }
@@ -558,5 +588,25 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       disconnectFromFacebook();
       isRunningCheckDataEmpty = false;
       super.onDestroy();
+   }
+
+   private void createProvinceIdNumber() throws JSONException {
+      listCityIdNumber = new ArrayList<>();
+      String jsonString = "";
+      try {
+         InputStream is = getResources().openRawResource(getResources().getIdentifier("province", "raw", getPackageName()));
+         int size = is.available();
+         byte[] buffer = new byte[size];
+         is.read(buffer);
+         is.close();
+         jsonString = new String(buffer, "UTF-8");
+      } catch (IOException ex) {
+         ex.printStackTrace();
+      }
+      JSONArray jsonArray = new JSONArray(jsonString);
+      for (int i = 0; i < jsonArray.length(); i++) {
+         JSONObject json_data = jsonArray.getJSONObject(i);
+         listCityIdNumber.add(new City(json_data.getString("title"), json_data.getInt("ID")));
+      }
    }
 }

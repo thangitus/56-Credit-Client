@@ -7,11 +7,32 @@ public class City {
    @SerializedName("Title")
    String tittle;
 
+   @SerializedName("ID")
+   int id;
+
    public String getTittle() {
       return tittle;
    }
 
    public void setTittle(String tittle) {
       this.tittle = tittle;
+   }
+
+   public int getId() {
+      return id;
+   }
+
+   public City(String tittle, int id) {
+      this.tittle = tittle;
+      this.id = id;
+   }
+
+   public void setId(int id) {
+      this.id = id;
+   }
+
+   public City(City city) {
+      this.tittle = city.getTittle();
+      this.id = city.getId();
    }
 }

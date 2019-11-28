@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -43,13 +44,13 @@ public class HomeActivity extends AppCompatActivity {
    public static String ID;
    ConstraintLayout constraintLayoutCMND, constraintLayoutAddInfo, constraintLayoutInfo, constraintLayoutSelfie;
    TextView tvFullName, tvIdNumber, tvBirthday, tvBuildingNumber, tvWards, tvProvince, tvDistrict;
-   TextView tvButtonEdit, tvReIdenty, tvReSelfie;
+   TextView tvButtonEdit, tvReIdentity, tvReSelfie;
    Button buttonSend;
    PersonalInformation personalInformation;
    Intent intentToAddInfo, intentCameraBack, intentCameraFront;
    ImageView imgCMND, imgSelfie;
    Bitmap bitmapCMND, bitmapSelfie;
-   int step = 0;
+   int step=1;
    Dialog dialogUpload, dialogResult;
    LottieAnimationView lottieAnimationView;
    StatusResponse status;
@@ -81,6 +82,7 @@ public class HomeActivity extends AppCompatActivity {
          @Override
          public void onClick(View view) {
             step--;
+            disableButtonSend();
             editInfo();
          }
       });
@@ -91,10 +93,11 @@ public class HomeActivity extends AppCompatActivity {
                openCameraBack();
          }
       });
-      tvReIdenty.setOnClickListener(new View.OnClickListener() {
+      tvReIdentity.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
             step--;
+            disableButtonSend();
             openCameraBack();
          }
       });
@@ -109,6 +112,7 @@ public class HomeActivity extends AppCompatActivity {
          @Override
          public void onClick(View view) {
             step--;
+            disableButtonSend();
             openCameraFront();
          }
       });
@@ -124,7 +128,7 @@ public class HomeActivity extends AppCompatActivity {
 
    private void setupIMG() {
       imgCMND.setVisibility(View.GONE);
-      tvReIdenty.setVisibility(View.GONE);
+      tvReIdentity.setVisibility(View.GONE);
       imgSelfie.setVisibility(View.GONE);
       tvReSelfie.setVisibility(View.GONE);
 
@@ -160,7 +164,7 @@ public class HomeActivity extends AppCompatActivity {
       tvProvince = findViewById(R.id.textViewProvince);
       tvButtonEdit = findViewById(R.id.tvButtonEdit);
       tvReSelfie = findViewById(R.id.reTakePictureSelfie);
-      tvReIdenty = findViewById(R.id.reTakePicture);
+      tvReIdentity = findViewById(R.id.reTakePicture);
       imgCMND = findViewById(R.id.imgCMND);
       imgSelfie = findViewById(R.id.imgSelfie);
       buttonSend = findViewById(R.id.buttonSend);
@@ -192,7 +196,7 @@ public class HomeActivity extends AppCompatActivity {
             bitmapCMND = BitmapFactory.decodeFile(path);
             startThreadDecodeBitmap(bitmapCMND, "identity");
             setIMG(imgCMND, bitmapCMND);
-            tvReIdenty.setVisibility(View.VISIBLE);
+            tvReIdentity.setVisibility(View.VISIBLE);
 
          }
       }
@@ -248,13 +252,13 @@ public class HomeActivity extends AppCompatActivity {
    }
 
    private void sendData(PersonalInformation personalInformation) {
-//      personalInformation.setFullName("NGUYỄN VĂN THẮNG");
-//      personalInformation.setIdNumber("245401302");
-//      personalInformation.setBirthday("20-05-1999");
-//      personalInformation.setHomeTown("Nam Định");
-//      personalInformation.setProvince("TP Hồ Chí Minh");
-//      personalInformation.setDistrict("Quận 8");
-//      personalInformation.setPhoneNumber("0352846131");
+      personalInformation.setFullName("NGUYỄN VĂN THẮNG");
+      personalInformation.setIdNumber("245401302");
+      personalInformation.setBirthday("20-05-1999");
+      personalInformation.setHomeTown("Nam Định");
+      personalInformation.setProvince("TP Hồ Chí Minh");
+      personalInformation.setDistrict("Quận 8");
+      personalInformation.setPhoneNumber("0352846131");
       APIServer apiServer = ServerNetwork.getInstance().getRetrofit().create(APIServer.class);
       Call<ServerResponse> call = apiServer.sendData(personalInformation);
       call.enqueue(new Callback<ServerResponse>() {
@@ -263,6 +267,7 @@ public class HomeActivity extends AppCompatActivity {
             dialogUpload.dismiss();
             if (response.code() == 200) {
                ID = response.body().getUserId();
+               Log.wtf(TAG, ID);
                startThreadCheckStatus();
             } else showDialogResult("-1");
          }
@@ -306,14 +311,17 @@ public class HomeActivity extends AppCompatActivity {
       new Thread(new Runnable() {
          @Override
          public void run() {
+            Log.wtf(TAG,"Start decode");
             decodeBitmap(bitmap, key);
             Message message = handler.obtainMessage(1, "decoded");
             handler.sendMessage(message);
+            Log.wtf(TAG,"End decode");
          }
       }).start();
    }
 
    private void startThreadCheckStatus() {
+      disableButtonSend();
       APIServer apiServer = ServerNetwork.getInstance().getRetrofit().create(APIServer.class);
       String url = "/status?id=" + ID;
       new Thread(new Runnable() {
@@ -328,6 +336,7 @@ public class HomeActivity extends AppCompatActivity {
                      if (status.getStatus().equals("1") || status.getStatus().equals("-1")) {
                         isChecked = true;
                         showDialogResult(status.getStatus());
+                        enableButtonSend();
                      }
                   }
 
