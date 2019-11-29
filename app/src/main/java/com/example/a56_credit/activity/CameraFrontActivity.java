@@ -213,9 +213,9 @@ public class CameraFrontActivity extends AppCompatActivity {
 
                             FirebaseVisionFace face = faces.get(0);
                             float rotY = face.getHeadEulerAngleY();  // Head is rotated to the right rotY degrees
-                            if (rotY < -35)
+                            if (rotY < -25)
                                isRotatedRight = true;
-                            else if (rotY > 30) isRotatedLeft = true;
+                            else if (rotY > 25) isRotatedLeft = true;
 
                             if (!isRotatedRight) {
                                textViewNotify.setText("Xoay đầu qua phải");

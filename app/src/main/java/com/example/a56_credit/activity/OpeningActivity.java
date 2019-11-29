@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.a56_credit.R;
+
 public class OpeningActivity extends AppCompatActivity {
    private static final String TAG = "OpeningActivity";
 //   SharedPreferences mPrefs;
@@ -12,6 +14,7 @@ public class OpeningActivity extends AppCompatActivity {
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
+      setContentView(R.layout.activity_opening);
 //      mPrefs = getSharedPreferences("isFirst", MODE_PRIVATE);
       Boolean isFirst;
 //      isFirst = mPrefs.getBoolean("first", true);
@@ -22,7 +25,7 @@ public class OpeningActivity extends AppCompatActivity {
 //         editor.apply();
 //      } else
       Intent intent;
-         intent = new Intent(this, OnboardingActivity.class);
+      intent = new Intent(this, OnboardingActivity.class);
 
 
       new Thread(new Runnable() {

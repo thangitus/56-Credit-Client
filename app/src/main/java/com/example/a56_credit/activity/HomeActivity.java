@@ -67,6 +67,7 @@ public class HomeActivity extends AppCompatActivity {
          String type = (String) msg.obj;
          if (type.equals("decoded")) {
             step++;
+            Log.wtf(TAG, String.valueOf(step));
             if (step == 3)
                enableButtonSend();
             tvReIdentity.setAlpha(1);
@@ -150,7 +151,7 @@ public class HomeActivity extends AppCompatActivity {
          @Override
          public void onClick(View v) {
             showDialogAnimation(R.raw.loading);
-            PersonalInformation personalInformationTemp=new PersonalInformation(personalInformation);
+            PersonalInformation personalInformationTemp = new PersonalInformation(personalInformation);
             preProcessData(personalInformationTemp);
             sendData(personalInformationTemp);
          }
@@ -309,6 +310,7 @@ public class HomeActivity extends AppCompatActivity {
          @Override
          public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
             dialogUpload.dismiss();
+            Log.wtf(TAG, String.valueOf(response.code()));
             if (response.code() == 200) {
                ID = response.body().getUserId();
                Log.wtf(TAG, ID);
@@ -319,6 +321,7 @@ public class HomeActivity extends AppCompatActivity {
 
          @Override
          public void onFailure(Call<ServerResponse> call, Throwable t) {
+            showDialogResult("-1");
             dialogUpload.dismiss();
          }
       });

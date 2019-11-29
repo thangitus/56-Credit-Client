@@ -282,7 +282,9 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       tvProvince.setText(personalInformation.getProvince());
       if (personalInformation.getGender().equals("Nam") || personalInformation.getGender().equals("male")||personalInformation.getGender().equals("Male"))
          radioButtonMale.setChecked(true);
-      else radioButtonFemale.setChecked(true);
+      else if (personalInformation.getGender().equals("Nữ") || personalInformation.getGender().equals("female")||personalInformation.getGender().equals("Female")){
+         radioButtonFemale.setChecked(true);
+      }
    }
 
 
