@@ -7,38 +7,38 @@ import com.google.gson.annotations.SerializedName;
 
 public class PersonalInformation implements Parcelable {
 
+   public static final Creator<PersonalInformation> CREATOR = new Creator<PersonalInformation>() {
+      @Override
+      public PersonalInformation createFromParcel(Parcel in) {
+         return new PersonalInformation(in);
+      }
+
+      @Override
+      public PersonalInformation[] newArray(int size) {
+         return new PersonalInformation[size];
+      }
+   };
    @SerializedName("Fullname")
    String fullName;
-
    @SerializedName("IdentityNumber")
    String idNumber;
-
    @SerializedName("Birthday")
    String birthday;
-
    String gender;
-
    @SerializedName("Hometown")
    String homeTown;
-
    @SerializedName("BuildingNumber")
    String buildingNumber;
-
    @SerializedName("Wards")
    String wards;
-
    @SerializedName("Province")
    String province;
-
    @SerializedName("District")
    String district;
-
    @SerializedName("IDCardImage")
    String identity;
-
    @SerializedName("SelfieImage")
    String selfie;
-
    @SerializedName("PhoneNumber")
    String phoneNumber;
 
@@ -87,6 +87,21 @@ public class PersonalInformation implements Parcelable {
       phoneNumber = in.readString();
    }
 
+   public PersonalInformation(PersonalInformation personalInformation) {
+      this.fullName = personalInformation.getFullName();
+      this.idNumber = personalInformation.getIdNumber();
+      this.birthday = personalInformation.getBirthday();
+      this.gender = personalInformation.getGender();
+      this.homeTown = personalInformation.getHomeTown();
+      this.buildingNumber = personalInformation.getBuildingNumber();
+      this.wards = personalInformation.getWards();
+      this.province = personalInformation.getProvince();
+      this.district = personalInformation.getDistrict();
+      this.identity = personalInformation.getIdentity();
+      this.selfie = personalInformation.getSelfie();
+      this.phoneNumber = personalInformation.getPhoneNumber();
+   }
+
    @Override
    public void writeToParcel(Parcel dest, int flags) {
       dest.writeString(fullName);
@@ -107,18 +122,6 @@ public class PersonalInformation implements Parcelable {
    public int describeContents() {
       return 0;
    }
-
-   public static final Creator<PersonalInformation> CREATOR = new Creator<PersonalInformation>() {
-      @Override
-      public PersonalInformation createFromParcel(Parcel in) {
-         return new PersonalInformation(in);
-      }
-
-      @Override
-      public PersonalInformation[] newArray(int size) {
-         return new PersonalInformation[size];
-      }
-   };
 
    public String getFullName() {
       return fullName;

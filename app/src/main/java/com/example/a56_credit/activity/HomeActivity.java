@@ -33,6 +33,8 @@ import com.example.a56_credit.network.APIServer;
 import com.example.a56_credit.network.ServerNetwork;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,6 +44,7 @@ public class HomeActivity extends AppCompatActivity {
    private static final int REQUEST_CODE_INFO = 1, REQUEST_CODE_CAMERA_BACK = 2, REQUEST_CODE_CAMERA_FRONT = 3;
    private static final String TAG = "HomeActivity";
    public static String ID;
+   List<String> preAddressList;
    ConstraintLayout constraintLayoutCMND, constraintLayoutAddInfo, constraintLayoutInfo, constraintLayoutSelfie;
    TextView tvFullName, tvIdNumber, tvBirthday, tvBuildingNumber, tvWards, tvProvince, tvDistrict;
    TextView tvButtonEdit, tvReIdentity, tvReSelfie;
@@ -76,11 +79,13 @@ public class HomeActivity extends AppCompatActivity {
       }
    };
 
+
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_home);
       mapping();
+      initPrefix();
       disableButtonSend();
       if (personalInformation == null) {
          constraintLayoutAddInfo.setVisibility(View.GONE);
@@ -145,9 +150,19 @@ public class HomeActivity extends AppCompatActivity {
          @Override
          public void onClick(View v) {
             showDialogAnimation(R.raw.loading);
-            sendData(personalInformation);
+            PersonalInformation personalInformationTemp=new PersonalInformation(personalInformation);
+            preProcessData(personalInformationTemp);
+            sendData(personalInformationTemp);
          }
       });
+   }
+
+   private void initPrefix() {
+      preAddressList = new ArrayList<>();
+      preAddressList.add("Huyện ");
+      preAddressList.add("Thị Xã ");
+      preAddressList.add("Tỉnh ");
+      preAddressList.add("Thành Phố ");
    }
 
    private void setupIMG() {
@@ -266,10 +281,18 @@ public class HomeActivity extends AppCompatActivity {
       String encoded = Base64.encodeToString(bytes, Base64.NO_WRAP);
       if (key.equals("identity"))
          identity = encoded;
-//         personalInformation.setIdentity(encoded);
       else
          selfie = encoded;
-//         personalInformation.setSelfie(encoded);
+   }
+
+   private void preProcessData(PersonalInformation personalInformation) {
+      personalInformation.setIdentity(identity);
+      personalInformation.setSelfie(selfie);
+      for (String string : preAddressList) {
+         personalInformation.setHomeTown(personalInformation.getHomeTown().replace(string, ""));
+         personalInformation.setProvince(personalInformation.getProvince().replace(string, ""));
+         personalInformation.setDistrict(personalInformation.getDistrict().replace(string, ""));
+      }
    }
 
    private void sendData(PersonalInformation personalInformation) {
@@ -280,8 +303,6 @@ public class HomeActivity extends AppCompatActivity {
 //      personalInformation.setProvince("TP Hồ Chí Minh");
 //      personalInformation.setDistrict("Quận 8");
 //      personalInformation.setPhoneNumber("0352846131");
-      personalInformation.setIdentity(identity);
-      personalInformation.setSelfie(selfie);
       APIServer apiServer = ServerNetwork.getInstance().getRetrofit().create(APIServer.class);
       Call<ServerResponse> call = apiServer.sendData(personalInformation);
       call.enqueue(new Callback<ServerResponse>() {
@@ -302,19 +323,6 @@ public class HomeActivity extends AppCompatActivity {
          }
       });
 
-   }
-
-   private void showDialogAnimation(int res) {
-      dialogUpload = new Dialog(this);
-      LayoutInflater inflater = this.getLayoutInflater();
-      View view = inflater.inflate(R.layout.animation_dialog, null);
-      dialogUpload.setContentView(view);
-      dialogUpload.setCancelable(false);
-      dialogUpload.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-      lottieAnimationView = view.findViewById(R.id.animationView);
-      lottieAnimationView.setAnimation(res);
-      lottieAnimationView.playAnimation();
-      dialogUpload.show();
    }
 
    private void startThreadDecodeBitmap(Bitmap bitmap, String key) {
@@ -396,5 +404,18 @@ public class HomeActivity extends AppCompatActivity {
          }
       });
       dialogResult.show();
+   }
+
+   private void showDialogAnimation(int res) {
+      dialogUpload = new Dialog(this);
+      LayoutInflater inflater = this.getLayoutInflater();
+      View view = inflater.inflate(R.layout.animation_dialog, null);
+      dialogUpload.setContentView(view);
+      dialogUpload.setCancelable(false);
+      dialogUpload.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+      lottieAnimationView = view.findViewById(R.id.animationView);
+      lottieAnimationView.setAnimation(res);
+      lottieAnimationView.playAnimation();
+      dialogUpload.show();
    }
 }

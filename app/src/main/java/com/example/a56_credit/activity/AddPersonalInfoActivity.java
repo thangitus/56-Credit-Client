@@ -280,7 +280,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       tvHomeTown.setText(personalInformation.getHomeTown());
       tvDistrict.setText(personalInformation.getDistrict());
       tvProvince.setText(personalInformation.getProvince());
-      if (personalInformation.getGender().equals("Nam") || personalInformation.getGender().equals("male"))
+      if (personalInformation.getGender().equals("Nam") || personalInformation.getGender().equals("male")||personalInformation.getGender().equals("Male"))
          radioButtonMale.setChecked(true);
       else radioButtonFemale.setChecked(true);
    }
@@ -374,7 +374,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       }
       AlertDialog.Builder builder = new AlertDialog.Builder(this);
       builder.setTitle("Chọn nguyên quán");
-      CharSequence[] cs = titleCityList.toArray(new CharSequence[titleCityList.size()]);
+      CharSequence[] cs =  titleCityList.toArray(new CharSequence[titleCityList.size()]);
       builder.setItems(cs, new DialogInterface.OnClickListener() {
          @Override
          public void onClick(DialogInterface dialogInterface, int i) {
