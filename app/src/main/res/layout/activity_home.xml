@@ -41,137 +41,6 @@
             android:paddingEnd="20dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layoutCMND"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/border_radius"
-                android:paddingStart="20dp"
-                android:paddingTop="15dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="15dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/imgIconCMND"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/ic_cmnd"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/textViewCMND"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="15dp"
-                    android:text="@string/cmnd"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    app:layout_constraintBottom_toBottomOf="@+id/imgIconCMND"
-                    app:layout_constraintStart_toEndOf="@+id/imgIconCMND"
-                    app:layout_constraintTop_toTopOf="@+id/imgIconCMND" />
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/ic_arrow"
-                    app:layout_constraintBottom_toBottomOf="@+id/textViewCMND"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/textViewCMND" />
-
-                <ImageView
-                    android:id="@+id/imgCMND"
-                    android:layout_width="150dp"
-                    android:layout_height="100dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/cmnd"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/imgIconCMND" />
-
-                <TextView
-                    android:id="@+id/reTakePicture"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
-                    android:text="@string/reTakePicture"
-                    android:textColor="@color/colorGreenLight"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layoutSelfie"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/border_radius"
-                android:paddingStart="20dp"
-                android:paddingTop="15dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="15dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/layoutCMND">
-
-                <ImageView
-                    android:id="@+id/imgIconSelfie"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/ic_selfie"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/textViewSelfie"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="15dp"
-                    android:text="@string/selfie"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    app:layout_constraintBottom_toBottomOf="@+id/imgIconSelfie"
-                    app:layout_constraintStart_toEndOf="@+id/imgIconSelfie"
-                    app:layout_constraintTop_toTopOf="@+id/imgIconSelfie" />
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/ic_arrow"
-                    app:layout_constraintBottom_toBottomOf="@+id/textViewSelfie"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/textViewSelfie" />
-
-                <ImageView
-                    android:id="@+id/imgSelfie"
-                    android:layout_width="150dp"
-                    android:layout_height="100dp"
-                    android:layout_marginTop="10dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/cmnd"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/imgIconSelfie" />
-
-                <TextView
-                    android:id="@+id/reTakePictureSelfie"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
-                    android:text="@string/reTakePicture"
-                    android:textColor="@color/colorGreenLight"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layoutInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -183,7 +52,7 @@
                 android:paddingBottom="15dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/layoutSelfie">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
                     android:id="@+id/imgIconInfo"
@@ -414,6 +283,138 @@
                     app:layout_constraintTop_toBottomOf="@id/layoutAddInfo" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutCMND"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/border_radius"
+                android:paddingStart="20dp"
+                android:paddingTop="15dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="15dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layoutInfo">
+
+                <ImageView
+                    android:id="@+id/imgIconCMND"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_cmnd"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/textViewCMND"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="15dp"
+                    android:text="@string/cmnd"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    app:layout_constraintBottom_toBottomOf="@+id/imgIconCMND"
+                    app:layout_constraintStart_toEndOf="@+id/imgIconCMND"
+                    app:layout_constraintTop_toTopOf="@+id/imgIconCMND" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_arrow"
+                    app:layout_constraintBottom_toBottomOf="@+id/textViewCMND"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/textViewCMND" />
+
+                <ImageView
+                    android:id="@+id/imgCMND"
+                    android:layout_width="150dp"
+                    android:layout_height="100dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/cmnd"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/imgIconCMND" />
+
+                <TextView
+                    android:id="@+id/reTakePicture"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:text="@string/reTakePicture"
+                    android:textColor="@color/colorGreenLight"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutSelfie"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/border_radius"
+                android:paddingStart="20dp"
+                android:paddingTop="15dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="15dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/layoutCMND">
+
+                <ImageView
+                    android:id="@+id/imgIconSelfie"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_selfie"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/textViewSelfie"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="15dp"
+                    android:text="@string/selfie"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    app:layout_constraintBottom_toBottomOf="@+id/imgIconSelfie"
+                    app:layout_constraintStart_toEndOf="@+id/imgIconSelfie"
+                    app:layout_constraintTop_toTopOf="@+id/imgIconSelfie" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_arrow"
+                    app:layout_constraintBottom_toBottomOf="@+id/textViewSelfie"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/textViewSelfie" />
+
+                <ImageView
+                    android:id="@+id/imgSelfie"
+                    android:layout_width="150dp"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="10dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/cmnd"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/imgIconSelfie" />
+
+                <TextView
+                    android:id="@+id/reTakePictureSelfie"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:text="@string/reTakePicture"
+                    android:textColor="@color/colorGreenLight"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
             <Button
                 android:id="@+id/buttonSend"
                 android:layout_width="match_parent"
@@ -431,7 +432,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layoutInfo" />
+                app:layout_constraintTop_toBottomOf="@id/layoutSelfie" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
