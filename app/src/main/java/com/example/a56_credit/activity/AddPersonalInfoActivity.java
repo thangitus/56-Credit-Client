@@ -280,13 +280,12 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       tvHomeTown.setText(personalInformation.getHomeTown());
       tvDistrict.setText(personalInformation.getDistrict());
       tvProvince.setText(personalInformation.getProvince());
-      if (personalInformation.getGender().equals("Nam") || personalInformation.getGender().equals("male")||personalInformation.getGender().equals("Male"))
+      if (personalInformation.getGender().equals("Nam") || personalInformation.getGender().equals("male") || personalInformation.getGender().equals("Male"))
          radioButtonMale.setChecked(true);
-      else if (personalInformation.getGender().equals("Nữ") || personalInformation.getGender().equals("female")||personalInformation.getGender().equals("Female")){
+      else if (personalInformation.getGender().equals("Nữ") || personalInformation.getGender().equals("female") || personalInformation.getGender().equals("Female")) {
          radioButtonFemale.setChecked(true);
       }
    }
-
 
    private void datePicker() {
       myCalendar = Calendar.getInstance();
@@ -376,7 +375,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       }
       AlertDialog.Builder builder = new AlertDialog.Builder(this);
       builder.setTitle("Chọn nguyên quán");
-      CharSequence[] cs =  titleCityList.toArray(new CharSequence[titleCityList.size()]);
+      CharSequence[] cs = titleCityList.toArray(new CharSequence[titleCityList.size()]);
       builder.setItems(cs, new DialogInterface.OnClickListener() {
          @Override
          public void onClick(DialogInterface dialogInterface, int i) {
@@ -452,7 +451,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
 
    private Boolean checkLogicData(PersonalInformation personalInformation) {
       if (personalInformation.getIdNumber().length() != 9) {
-         Toast.makeText(this, "Số CMND không hợp lệ", Toast.LENGTH_SHORT).show();
+         Toast.makeText(this, "Số CMND phải có 9 chữ số", Toast.LENGTH_SHORT).show();
          return false;
       } else {
          String province = personalInformation.getProvince();
@@ -462,7 +461,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
                String id = String.valueOf(listCityIdNumber.get(i).getId());
                String cmp = String.valueOf(personalID.subSequence(0, id.length()));
                if (!id.equals(cmp)) {
-                  Toast.makeText(this, "Số CMND không hợp lệ", Toast.LENGTH_SHORT).show();
+                  Toast.makeText(this, "Số CMND không phải của tỉnh " + personalInformation.getProvince(), Toast.LENGTH_SHORT).show();
                   return false;
                }
             }
@@ -561,7 +560,6 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
          }
       });
    }
-
 
    @Override
    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

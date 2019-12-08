@@ -97,7 +97,6 @@ public class CameraFrontActivity extends AppCompatActivity {
       showDialog();
    }
 
-
    private void mapping() {
       buttonClose = findViewById(R.id.buttonCloseFront);
       cameraView = findViewById(R.id.camera_front);
@@ -112,7 +111,7 @@ public class CameraFrontActivity extends AppCompatActivity {
                  @Override
                  public void process(@NotNull Frame frame) {
                     currentTime = System.currentTimeMillis();
-                    if (currentTime - 500 > prevTime && isFaceProcessRunning) {
+                    if (currentTime - 500 > prevTime) {
                        faceOptions(frame);
                        prevTime = currentTime;
                     }
@@ -135,7 +134,6 @@ public class CameraFrontActivity extends AppCompatActivity {
               ))
               .build();
    }
-
 
    @Override
    protected void onPause() {
@@ -193,7 +191,6 @@ public class CameraFrontActivity extends AppCompatActivity {
    }
 
    private void faceOptions(Frame frame) {
-      if (!isFaceProcessRunning) return;
       detector.detectInImage(getVisionImageFromFrame(frame))
               .addOnSuccessListener(
                       new OnSuccessListener<List<FirebaseVisionFace>>() {
@@ -203,11 +200,13 @@ public class CameraFrontActivity extends AppCompatActivity {
                                isRotatedLeft = false;
                                isRotatedRight = false;
                                textViewNotify.setText("Có nhiều hơn một người trong khung hình");
+                               isFaceProcessRunning = true;
                                return;
                             } else if (faces.size() < 1) {
                                isRotatedLeft = false;
                                isRotatedRight = false;
                                textViewNotify.setText("Không tìm thấy khuôn mặt trong khung hình");
+                               isFaceProcessRunning = true;
                                return;
                             }
 
@@ -258,13 +257,17 @@ public class CameraFrontActivity extends AppCompatActivity {
          int time = second;
 
          public void onTick(long millisUntilFinished) {
-            textViewNotify.setText("Bắt đầu chụp trong " + time + " giây nữa!");
-            time--;
+            if (!isFaceProcessRunning) {
+               textViewNotify.setText("Bắt đầu chụp trong " + time + " giây nữa!");
+               time--;
+            }
          }
 
          public void onFinish() {
-            textViewNotify.setText("Bắt đầu chụp trong " + time + " giây nữa!");
-            takePhoto();
+            if (!isFaceProcessRunning) {
+               textViewNotify.setText("Bắt đầu chụp trong " + time + " giây nữa!");
+               takePhoto();
+            }
          }
       }.start();
    }

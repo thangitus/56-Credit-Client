@@ -42,6 +42,7 @@ import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
    private static final int REQUEST_CODE_INFO = 1, REQUEST_CODE_CAMERA_BACK = 2, REQUEST_CODE_CAMERA_FRONT = 3;
+   private static final int RATIO_SCALE = 1;
    private static final String TAG = "HomeActivity";
    public static String ID;
    List<String> preAddressList;
@@ -79,7 +80,6 @@ public class HomeActivity extends AppCompatActivity {
          }
       }
    };
-
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -210,7 +210,6 @@ public class HomeActivity extends AppCompatActivity {
       buttonSend = findViewById(R.id.buttonSend);
    }
 
-
    @Override
    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
       super.onActivityResult(requestCode, resultCode, data);
@@ -275,7 +274,7 @@ public class HomeActivity extends AppCompatActivity {
    }
 
    private void decodeBitmap(Bitmap bitmap, String key) {
-      bitmap = Bitmap.createScaledBitmap(bitmap, (int) (bitmap.getWidth() * 0.3), (int) (bitmap.getHeight() * 0.3), true);
+      bitmap = Bitmap.createScaledBitmap(bitmap, (int) (bitmap.getWidth() * RATIO_SCALE), (int) (bitmap.getHeight() * RATIO_SCALE), true);
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
       byte[] bytes = baos.toByteArray();
