@@ -3,6 +3,7 @@ package com.example.a56_credit.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +13,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,6 +47,7 @@ public class HomeActivity extends AppCompatActivity {
    private static final int RATIO_SCALE = 1;
    private static final String TAG = "HomeActivity";
    public static String ID;
+   protected PowerManager.WakeLock mWakeLock;
    List<String> preAddressList;
    ConstraintLayout constraintLayoutCMND, constraintLayoutAddInfo, constraintLayoutInfo, constraintLayoutSelfie;
    TextView tvFullName, tvIdNumber, tvBirthday, tvBuildingNumber, tvWards, tvProvince, tvDistrict;
@@ -88,6 +91,7 @@ public class HomeActivity extends AppCompatActivity {
       mapping();
       initPrefix();
       disableButtonSend();
+
       if (personalInformation == null) {
          constraintLayoutAddInfo.setVisibility(View.GONE);
          tvButtonEdit.setVisibility(View.GONE);
@@ -419,5 +423,20 @@ public class HomeActivity extends AppCompatActivity {
       lottieAnimationView.setAnimation(res);
       lottieAnimationView.playAnimation();
       dialogUpload.show();
+   }
+
+   @SuppressLint("InvalidWakeLockTag")
+   @Override
+   protected void onResume() {
+      super.onResume();
+      final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+      this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+      this.mWakeLock.acquire(3 * 60 * 1000L /*3 minutes*/);
+   }
+
+   @Override
+   public void onDestroy() {
+      this.mWakeLock.release();
+      super.onDestroy();
    }
 }
