@@ -250,6 +250,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
    }
 
    private Boolean checkDataEmpty() {
+      if (true) return true;
       if (personalInformation.getFullName().equals(""))
          return false;
       if (personalInformation.getIdNumber().equals(""))
@@ -490,7 +491,7 @@ public class AddPersonalInfoActivity extends AppCompatActivity {
       final List<String> permissionsList = new ArrayList<>();
       permissionsList.add("email");
       permissionsList.add("user_gender");
-      permissionsList.add("user_hometown");
+      permissionsList.add("ư");
       permissionsList.add("user_birthday");
       permissionsList.add("user_location");
       loginButton.setPermissions(permissionsList);

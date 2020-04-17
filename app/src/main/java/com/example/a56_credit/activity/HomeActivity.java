@@ -25,9 +25,11 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.databinding.DataBindingUtil;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.a56_credit.R;
+import com.example.a56_credit.databinding.ActivityHomeBinding;
 import com.example.a56_credit.model.PersonalInformation;
 import com.example.a56_credit.model.ServerResponse;
 import com.example.a56_credit.model.StatusResponse;
@@ -49,8 +51,7 @@ public class HomeActivity extends AppCompatActivity {
    public static String ID;
    protected PowerManager.WakeLock mWakeLock;
    List<String> preAddressList;
-   ConstraintLayout constraintLayoutCMND, constraintLayoutAddInfo, constraintLayoutInfo, constraintLayoutSelfie;
-   TextView tvFullName, tvIdNumber, tvBirthday, tvBuildingNumber, tvWards, tvProvince, tvDistrict;
+   ConstraintLayout constraintLayoutCMND, constraintLayoutInfo, constraintLayoutSelfie;
    TextView tvButtonEdit, tvReIdentity, tvReSelfie;
    Button buttonSend;
    PersonalInformation personalInformation;
@@ -63,6 +64,7 @@ public class HomeActivity extends AppCompatActivity {
    StatusResponse status;
    Boolean isChecked = false;
    String identity, selfie;
+   ActivityHomeBinding binding;
    @SuppressLint("HandlerLeak")
    private Handler handler = new Handler() {
       @Override
@@ -87,15 +89,11 @@ public class HomeActivity extends AppCompatActivity {
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
-      setContentView(R.layout.activity_home);
+      binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
+      setInfo();
       mapping();
       initPrefix();
       disableButtonSend();
-
-      if (personalInformation == null) {
-         constraintLayoutAddInfo.setVisibility(View.GONE);
-         tvButtonEdit.setVisibility(View.GONE);
-      }
       setupIMG();
       personalInformation = new PersonalInformation();
       intentToAddInfo = new Intent(this, AddPersonalInfoActivity.class);
@@ -197,16 +195,8 @@ public class HomeActivity extends AppCompatActivity {
    private void mapping() {
       constraintLayoutCMND = findViewById(R.id.layoutCMND);
       constraintLayoutInfo = findViewById(R.id.layoutInfo);
-      constraintLayoutAddInfo = findViewById(R.id.layoutAddInfo);
       constraintLayoutSelfie = findViewById(R.id.layoutSelfie);
-      tvFullName = findViewById(R.id.textViewFullName);
-      tvBirthday = findViewById(R.id.textViewBirthday);
-      tvWards = findViewById(R.id.textViewWards);
-      tvDistrict = findViewById(R.id.textViewDistrict);
-      tvIdNumber = findViewById(R.id.textViewIdNumber);
-      tvBuildingNumber = findViewById(R.id.textViewBuildingNumber);
-      tvProvince = findViewById(R.id.textViewProvince);
-      tvButtonEdit = findViewById(R.id.tvButtonEdit);
+      tvButtonEdit = findViewById(R.id.buttonEdit);
       tvReSelfie = findViewById(R.id.reTakePictureSelfie);
       tvReIdentity = findViewById(R.id.reTakePicture);
       imgCMND = findViewById(R.id.imgCMND);
@@ -256,15 +246,7 @@ public class HomeActivity extends AppCompatActivity {
    }
 
    private void setInfo() {
-      tvFullName.setText(personalInformation.getFullName());
-      tvIdNumber.setText(personalInformation.getIdNumber());
-      tvProvince.setText(personalInformation.getProvince());
-      tvBuildingNumber.setText(personalInformation.getBuildingNumber());
-      tvBirthday.setText(personalInformation.getBirthday());
-      tvDistrict.setText(personalInformation.getDistrict());
-      tvWards.setText(personalInformation.getWards());
-      constraintLayoutAddInfo.setVisibility(View.VISIBLE);
-      tvButtonEdit.setVisibility(View.VISIBLE);
+      binding.setPersonalInformation(personalInformation);
    }
 
    private void openCameraBack() {
@@ -300,13 +282,6 @@ public class HomeActivity extends AppCompatActivity {
    }
 
    private void sendData(PersonalInformation personalInformation) {
-//      personalInformation.setFullName("NGUYỄN VĂN THẮNG");
-//      personalInformation.setIdNumber("245401302");
-//      personalInformation.setBirthday("20-05-1999");
-//      personalInformation.setHomeTown("Nam Định");
-//      personalInformation.setProvince("TP Hồ Chí Minh");
-//      personalInformation.setDistrict("Quận 8");
-//      personalInformation.setPhoneNumber("0352846131");
       APIServer apiServer = ServerNetwork.getInstance().getRetrofit().create(APIServer.class);
       Call<ServerResponse> call = apiServer.sendData(personalInformation);
       call.enqueue(new Callback<ServerResponse>() {
